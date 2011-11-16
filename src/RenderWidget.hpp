@@ -37,7 +37,7 @@
 #include "content/browser/renderer_host/render_widget_host.h"
 #include "content/browser/renderer_host/render_widget_host_view.h"
 #if defined(OS_MACOSX)
-#include "content/browser/renderer_host/accelerated_surface_container_manager_mac.h"#
+#include "content/browser/renderer_host/accelerated_surface_container_manager_mac.h"
 #endif
 #include "ui/gfx/rect.h"
 //see chrome/browser/renderer_host/test/test_render_view_host.h for a stub impl.
@@ -266,7 +266,6 @@ private:
 
 #if defined(OS_WIN)
     // When we are doing accelerated compositing
-#if defined(OS_WIN)
     HWND compositor_host_window_;
 #endif
 

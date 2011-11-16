@@ -108,8 +108,9 @@ IF(NOT CHROMIUM_ISSCONS)
      ${CHROMIUM_CHLIBS}/v8/tools/gyp
      ${CHROMIUM_CHLIBS}/v8/src/extensions/experimental
      ${CHROMIUM_CHLIBS}/gpu
+     ${CHROMIUM_CHLIBS}/ui
      ${CHROMIUM_CHLIBS}/ui/gfx
-     ${CHROMIUM_CHLIBS}/gfx
+     ${CHROMIUM_CHLIBS}/ui/gfx/gl
      ${CHROMIUM_CHLIBS}/sdch
      ${CHROMIUM_CHLIBS}/build/temp_gyp
      ${CHROMIUM_CHLIBS}/seccompsandbox
@@ -142,6 +143,8 @@ IF(NOT CHROMIUM_ISSCONS)
      ${CHROMIUM_CHLIBS}/content
      ${CHROMIUM_CHLIBS}/chrome/app/policy
      ${CHROMIUM_CHLIBS}/webkit/support
+     ${CHROMIUM_CHLIBS}/chrome/browser/sync/protocol
+     ${CHROMIUM_CHLIBS}/crypto
      )
 
     SET(CHROMIUM_TPLIBS ${CHROMIUM_CHLIBS}/third_party/openmax/libil.a event zlib png jpeg xslt bz2 Xss ${CHROMIUM_CHLIBS}/third_party/sqlite/libsqlite3.a ${CHROMIUM_CHLIBS}/net/third_party/nss/libssl.a undoview allocator base_i18n xdg_mime seccomp_sandbox symbolize)
@@ -180,7 +183,6 @@ SET(CHROMIUMLIBS
   webcore_platform
   webcore_html
   ${CHROMIUM_TPLIBS}
-  gfx
   dl
   m
   common
@@ -194,6 +196,7 @@ SET(CHROMIUMLIBS
   app_base
   appcache
   base
+  base_static
   base_i18n
   protobuf_lite
   glue
@@ -226,6 +229,7 @@ SET(CHROMIUMLIBS
   ffmpeg
   http_server
   cacheinvalidation
+  cacheinvalidation_proto_cpp
   chromoting_base
   chromoting_client
   chromoting_host
@@ -240,17 +244,15 @@ SET(CHROMIUMLIBS
   ppapi_proxy
   ppapi_shared_impl
   sync_notifier
+  sync_proto_cpp
   gles2_implementation
   gles2_c_lib
   command_buffer_client
   command_buffer_service
   command_buffer_common
   gles2_cmd_helper
-  chrome_gpu
   hunspell
-  plugin
   ipc
-  worker
   common_constants
   default_plugin
   jingle
@@ -259,7 +261,6 @@ SET(CHROMIUMLIBS
   profile_import
   service
   policy
-  webp
   flac
   gpu_ipc
   yuv_convert_sse2
@@ -276,6 +277,10 @@ SET(CHROMIUMLIBS
   content_browser
   content_common
   webcore_rendering
+  gl
+  in_memory_url_index_cache_proto_cpp
+  ui_gfx
+  crcrypto
   )
 
 IF (APPLE OR LINUX_ENABLE_NACL)

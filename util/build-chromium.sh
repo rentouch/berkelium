@@ -259,7 +259,7 @@ elif [ x"${platform}" = x"Linux" ]; then
                     sudo apt-get install msttcorefonts libgconf2-dev libcairo2-dev libdbus-1-dev
                     sudo apt-get install liborbit2-dev libpopt-dev orbit2 libjpeg-dev libbz2-dev
                     sudo apt-get install libnss3-dev libgnome-keyring-dev libdbus-glib-1-dev
-                    sudo apt-get install libcups2-dev libxss-dev
+                    sudo apt-get install libcups2-dev libxss-dev libxtst-dev libpam0g-dev binutils-gold
                     ;;
                 fedora )
                     sudo yum install subversion pkgconfig python perl ruby gcc-c++ bison \
