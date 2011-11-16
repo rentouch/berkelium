@@ -31,6 +31,8 @@
  */
 
 #include "berkelium/Berkelium.hpp"
+#include "base/path_service.h"
+#include "base/file_util.h"
 #include "Root.hpp"
 
 namespace Berkelium {
@@ -54,6 +56,7 @@ bool init (FileString homeDirectory) {
     }
     return true;
 }
+
 void destroy () {
     Root::destroy();
 }

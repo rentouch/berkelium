@@ -18,6 +18,7 @@
 #    APP - the name of the app to link to, must be a file or existing target
 #    LINKS - additional binaries to link into the .app; this almost certainly
 #            includes the renderer binary
+#    COPY - additional files to copy into the .app
 #
 #  On Linux:
 #  ADD_CHROME_SYMLINK_TARGET - Adds a target which adds symlinks to the
@@ -87,8 +88,61 @@ IF(NOT CHROMIUM_ISSCONS)
       SET(CHROMIUM_CHLIBS ${CHROMIUM_DATADIR}/obj.target)
     ENDIF()
 
-   SET(CHROME_LIBRARY_DIRS ${CHROMIUM_CHLIBS} ${CHROMIUM_CHLIBS}/app ${CHROMIUM_CHLIBS}/chrome/app/policy ${CHROMIUM_CHLIBS}/crypto ${CHROMIUM_CHLIBS}/content ${CHROMIUM_CHLIBS}/base ${CHROMIUM_CHLIBS}/base/allocator ${CHROMIUM_CHLIBS}/chrome/browser/sync/protocol ${CHROMIUM_CHLIBS}/ipc ${CHROMIUM_CHLIBS}/jingle ${CHROMIUM_CHLIBS}/chrome ${CHROMIUM_CHLIBS}/chrome/default_plugin ${CHROMIUM_CHLIBS}/net ${CHROMIUM_CHLIBS}/media ${CHROMIUM_CHLIBS}/webkit ${CHROMIUM_CHLIBS}/sandbox ${CHROMIUM_CHLIBS}/skia ${CHROMIUM_CHLIBS}/remoting ${CHROMIUM_CHLIBS}/remoting/proto ${CHROMIUM_CHLIBS}/printing ${CHROMIUM_CHLIBS}/v8/tools/gyp ${CHROMIUM_CHLIBS}/v8/src/extensions/experimental ${CHROMIUM_CHLIBS}/gpu ${CHROMIUM_CHLIBS}/ui ${CHROMIUM_CHLIBS}/ui/gfx ${CHROMIUM_CHLIBS}/ui/gfx/gl ${CHROMIUM_CHLIBS}/sdch ${CHROMIUM_CHLIBS}/build/temp_gyp  ${CHROMIUM_CHLIBS}/seccompsandbox ${CHROMIUM_CHLIBS}/third_party/undoview ${CHROMIUM_CHLIBS}/ppapi ${CHROMIUM_CHLIBS}/third_party/ffmpeg ${CHROMIUM_CHLIBS}/third_party/openmax ${CHROMIUM_CHLIBS}/third_party/harfbuzz ${CHROMIUM_CHLIBS}/third_party/libjingle ${CHROMIUM_CHLIBS}/third_party/hunspell ${CHROMIUM_CHLIBS}/third_party/icu ${CHROMIUM_CHLIBS}/third_party/libevent ${CHROMIUM_CHLIBS}/third_party/libxml ${CHROMIUM_CHLIBS}/third_party/libxslt ${CHROMIUM_CHLIBS}/third_party/modp_b64 ${CHROMIUM_CHLIBS}/third_party/protobuf ${CHROMIUM_CHLIBS}/third_party/cld ${CHROMIUM_CHLIBS}/third_party/ots ${CHROMIUM_CHLIBS}/third_party/angle/src ${CHROMIUM_CHLIBS}/base/third_party/dynamic_annotations ${CHROMIUM_CHLIBS}/third_party/sqlite ${CHROMIUM_CHLIBS}/third_party/zlib ${CHROMIUM_CHLIBS}/third_party/flac ${CHROMIUM_CHLIBS}/third_party/libwebp ${CHROMIUM_CHLIBS}/third_party/libjpeg_turbo ${CHROMIUM_CHLIBS}/third_party/cacheinvalidation ${CHROMIUM_CHLIBS}/webkit/support ${CHROMIUM_CHLIBS}/third_party/WebKit/Source/WebKit/chromium ${CHROMIUM_CHLIBS}/third_party/WebKit/Source/JavaScriptCore/JavaScriptCore.gyp ${CHROMIUM_CHLIBS}/third_party/WebKit/Source/WebCore/WebCore.gyp)
-
+   SET(CHROME_LIBRARY_DIRS
+     ${CHROMIUM_CHLIBS}
+     ${CHROMIUM_CHLIBS}/app
+     ${CHROMIUM_CHLIBS}/base
+     ${CHROMIUM_CHLIBS}/base/allocator
+     ${CHROMIUM_CHLIBS}/ipc
+     ${CHROMIUM_CHLIBS}/jingle
+     ${CHROMIUM_CHLIBS}/chrome
+     ${CHROMIUM_CHLIBS}/chrome/default_plugin
+     ${CHROMIUM_CHLIBS}/net
+     ${CHROMIUM_CHLIBS}/media
+     ${CHROMIUM_CHLIBS}/webkit
+     ${CHROMIUM_CHLIBS}/sandbox
+     ${CHROMIUM_CHLIBS}/skia
+     ${CHROMIUM_CHLIBS}/remoting
+     ${CHROMIUM_CHLIBS}/remoting/proto
+     ${CHROMIUM_CHLIBS}/printing
+     ${CHROMIUM_CHLIBS}/v8/tools/gyp
+     ${CHROMIUM_CHLIBS}/v8/src/extensions/experimental
+     ${CHROMIUM_CHLIBS}/gpu
+     ${CHROMIUM_CHLIBS}/ui/gfx
+     ${CHROMIUM_CHLIBS}/gfx
+     ${CHROMIUM_CHLIBS}/sdch
+     ${CHROMIUM_CHLIBS}/build/temp_gyp
+     ${CHROMIUM_CHLIBS}/seccompsandbox
+     ${CHROMIUM_CHLIBS}/third_party/undoview
+     ${CHROMIUM_CHLIBS}/ppapi
+     ${CHROMIUM_CHLIBS}/third_party/ffmpeg
+     ${CHROMIUM_CHLIBS}/third_party/openmax
+     ${CHROMIUM_CHLIBS}/third_party/harfbuzz
+     ${CHROMIUM_CHLIBS}/third_party/libjingle
+     ${CHROMIUM_CHLIBS}/third_party/hunspell
+     ${CHROMIUM_CHLIBS}/third_party/icu
+     ${CHROMIUM_CHLIBS}/third_party/libevent
+     ${CHROMIUM_CHLIBS}/third_party/libxml
+     ${CHROMIUM_CHLIBS}/third_party/libxslt
+     ${CHROMIUM_CHLIBS}/third_party/modp_b64
+     ${CHROMIUM_CHLIBS}/third_party/protobuf
+     ${CHROMIUM_CHLIBS}/third_party/cld
+     ${CHROMIUM_CHLIBS}/third_party/ots
+     ${CHROMIUM_CHLIBS}/third_party/angle/src
+     ${CHROMIUM_CHLIBS}/base/third_party/dynamic_annotations
+     ${CHROMIUM_CHLIBS}/third_party/sqlite
+     ${CHROMIUM_CHLIBS}/third_party/zlib
+     ${CHROMIUM_CHLIBS}/third_party/flac
+     ${CHROMIUM_CHLIBS}/third_party/libwebp
+     ${CHROMIUM_CHLIBS}/third_party/cacheinvalidation
+     ${CHROMIUM_CHLIBS}/webkit/support
+     ${CHROMIUM_CHLIBS}/third_party/WebKit/Source/WebKit/chromium
+     ${CHROMIUM_CHLIBS}/third_party/WebKit/Source/JavaScriptCore/JavaScriptCore.gyp
+     ${CHROMIUM_CHLIBS}/third_party/WebKit/Source/WebCore/WebCore.gyp
+     ${CHROMIUM_CHLIBS}/content
+     ${CHROMIUM_CHLIBS}/chrome/app/policy
+     ${CHROMIUM_CHLIBS}/webkit/support
+     )
 
     SET(CHROMIUM_TPLIBS ${CHROMIUM_CHLIBS}/third_party/openmax/libil.a event zlib png jpeg xslt bz2 Xss ${CHROMIUM_CHLIBS}/third_party/sqlite/libsqlite3.a ${CHROMIUM_CHLIBS}/net/third_party/nss/libssl.a undoview allocator base_i18n xdg_mime seccomp_sandbox symbolize)
 
@@ -118,7 +172,112 @@ ELSE(NOT CHROMIUM_ISSCONS)
   SET(CHROMIUM_TPLIBS event xslt jpeg png z bz2 ${CHROMIUMLIBPATH}/libsqlite.a google_nacl_imc_c  base_i18n)
 ENDIF(NOT CHROMIUM_ISSCONS)
 
-SET(CHROMIUMLIBS ${CHROMIUMLDFLAGS} webcore_svg webcore_bindings webcore_remaining webcore_platform webcore_html webcore_rendering crcrypto ${CHROMIUM_TPLIBS} ui_gfx dl m common common_net dynamic_annotations browser debugger renderer utility printing app_base appcache base base_i18n base_static protobuf_lite glue icui18n installer_util database syncapi sync icuuc icudata skia skia_opts xml2 net net_base cld ots googleurl sdch modp_b64 v8_snapshot v8_base wtf webkit fileapi  webkit_user_agent blob speex media ffmpeg http_server cacheinvalidation chromoting_base chromoting_client chromoting_host chromoting_protocol chromoting_jingle_glue chromotocol_proto_lib trace_proto_lib jingle_p2p chromoting_plugin notifier ppapi_cpp_objects ppapi_proxy ppapi_shared_impl sync_notifier sync_proto_cpp gles2_implementation gles2_c_lib command_buffer_client command_buffer_service command_buffer_common gles2_cmd_helper gl content_gpu content_browser content_common content_renderer hunspell content_plugin ipc content_worker common_constants default_plugin jingle translator_common translator_glsl profile_import service policy webp_dec flac gpu_common gpu_ipc yuv_convert_sse2 yuv_convert yarr i18n_api cpu_features webkit_gpu cups jpeg_turbo in_memory_url_index_cache_proto_cpp cacheinvalidation_proto_cpp)
+SET(CHROMIUMLIBS
+  ${CHROMIUMLDFLAGS}
+  webcore_svg
+  webcore_bindings
+  webcore_remaining
+  webcore_platform
+  webcore_html
+  ${CHROMIUM_TPLIBS}
+  gfx
+  dl
+  m
+  common
+  common_net
+  dynamic_annotations
+  browser
+  debugger
+  renderer
+  utility
+  printing
+  app_base
+  appcache
+  base
+  base_i18n
+  protobuf_lite
+  glue
+  icui18n
+  installer_util
+  database
+  syncapi
+  sync
+  icuuc
+  icudata
+  skia
+  skia_opts
+  xml2
+  net
+  net_base
+  cld
+  ots
+  googleurl
+  sdch
+  modp_b64
+  v8_snapshot
+  v8_base
+  wtf
+  webkit
+  fileapi
+  webkit_user_agent
+  blob
+  speex
+  media
+  ffmpeg
+  http_server
+  cacheinvalidation
+  chromoting_base
+  chromoting_client
+  chromoting_host
+  chromoting_protocol
+  chromoting_jingle_glue
+  chromotocol_proto_lib
+  trace_proto_lib
+  jingle_p2p
+  chromoting_plugin
+  notifier
+  ppapi_cpp_objects
+  ppapi_proxy
+  ppapi_shared_impl
+  sync_notifier
+  gles2_implementation
+  gles2_c_lib
+  command_buffer_client
+  command_buffer_service
+  command_buffer_common
+  gles2_cmd_helper
+  chrome_gpu
+  hunspell
+  plugin
+  ipc
+  worker
+  common_constants
+  default_plugin
+  jingle
+  translator_common
+  translator_glsl
+  profile_import
+  service
+  policy
+  webp
+  flac
+  gpu_ipc
+  yuv_convert_sse2
+  yuv_convert
+  yarr
+  i18n_api
+  cpu_features
+  webkit_gpu
+  cups
+  pam
+  gcrypt
+  quota
+  ${CHROMIUM_CHLIBS}/third_party/libjpeg_turbo/libjpeg_turbo.a
+  content_browser
+  content_common
+  webcore_rendering
+  )
+
 IF (APPLE OR LINUX_ENABLE_NACL)
   SET(CHROMIUMLIBS ${CHROMIUMLIBS} nacl nacl_base nacl_ppapi_browser nonnacl_srpc nonnacl_util sel sel_ldr_launcher gio gio_wrapped_desc platform nrd_xfer debug_stub platform_qual_lib)
 ENDIF()
@@ -153,7 +312,7 @@ ENDFOREACH()
 IF(CHROME_FOUND)
   IF(APPLE)
     MACRO(ADD_CHROME_APP)
-      PARSE_ARGUMENTS(CHROME_APP "APP;DEPENDS;LINKS" "" ${ARGN})
+      PARSE_ARGUMENTS(CHROME_APP "APP;DEPENDS;LINKS;COPY" "" ${ARGN})
 
       IF(NOT CHROME_APP_APP)
         MESSAGE(ERROR "No application name specified as parameter to ADD_CHROME_APP")
@@ -163,7 +322,8 @@ IF(CHROME_FOUND)
 
       SET(CHROMIUM_FRAMEWORK Chromium\ Framework.framework)
       SET(CHROME_LANG en)
-      SET(CHROMIUM_FRAMEWORK_PATH ${CHROME_ROOT}/src/xcodebuild/${CHROMIUMMODE}/${CHROMIUM_FRAMEWORK})
+      SET(CHROMIUM_BIN_BUILD_PATH ${CHROME_ROOT}/src/xcodebuild/${CHROMIUMMODE})
+      SET(CHROMIUM_FRAMEWORK_PATH ${CHROMIUM_BIN_BUILD_PATH}/${CHROMIUM_FRAMEWORK})
       SET(LOCAL_CHROMIUM_FRAMEWORK ${CHROME_APP_NAME}/Contents/lib/${CHROMIUM_FRAMEWORK})
       SET(CHROME_SYMLINKS_COMMAND
         mkdir -p ${CHROME_APP_NAME} &&
@@ -174,6 +334,7 @@ IF(CHROME_FOUND)
         mkdir -p ${LOCAL_CHROMIUM_FRAMEWORK}/Libraries &&
         mkdir -p ${LOCAL_CHROMIUM_FRAMEWORK}/Resources &&
         sh ${BERKELIUM_TOP_LEVEL}/util/make-info-plist.sh ${CHROME_ROOT} ${CHROME_APP_NAME} ${CHROME_APP_APP} org.berkelium.${CHROME_APP_APP} &&
+        ln -sf ${CHROMIUM_BIN_BUILD_PATH}/libplugin_carbon_interpose.dylib ${CHROME_APP_NAME}/Contents/MacOS/ &&
         ln -sf ${CHROMIUM_FRAMEWORK_PATH}/Libraries/libffmpegsumo.dylib ${LOCAL_CHROMIUM_FRAMEWORK}/Libraries/ &&
         ln -sf ${CHROMIUM_FRAMEWORK_PATH}/Resources/chrome.pak ${LOCAL_CHROMIUM_FRAMEWORK}/Resources/ &&
         ln -sf ${CHROMIUM_FRAMEWORK_PATH}/Resources/${CHROME_LANG}.lproj ${LOCAL_CHROMIUM_FRAMEWORK}/Resources/ &&
@@ -186,13 +347,18 @@ IF(CHROME_FOUND)
 
       SET(CHROME_SYMLINKS_COMMAND
         ${CHROME_SYMLINKS_COMMAND} &&
-        ln -sf ${CMAKE_CURRENT_BINARY_DIR}/${CHROME_APP_APP} ${CHROME_APP_NAME}/Contents/MacOS/ &&
-        ln -sf ${CMAKE_CURRENT_BINARY_DIR}/libplugin_carbon_interpose.dylib ${CHROME_APP_NAME}/Contents/MacOS/
+        ln -sf ${CMAKE_CURRENT_BINARY_DIR}/${CHROME_APP_APP} ${CHROME_APP_NAME}/Contents/MacOS/
         )
       FOREACH(CHROME_SYMLINK_BINARY ${CHROME_APP_LINKS})
         SET(CHROME_SYMLINKS_COMMAND
           ${CHROME_SYMLINKS_COMMAND} &&
-          cp -f ${CHROME_SYMLINK_BINARY} ${CHROME_APP_NAME}/Contents/MacOS/
+          ln -sf ${CHROME_SYMLINK_BINARY} ${CHROME_APP_NAME}/Contents/MacOS/
+          )
+      ENDFOREACH()
+      FOREACH(CHROME_COPY_BINARY ${CHROME_APP_COPY})
+        SET(CHROME_SYMLINKS_COMMAND
+          ${CHROME_SYMLINKS_COMMAND} &&
+          (cp -f ${CHROME_COPY_BINARY} ${CHROME_APP_NAME}/Contents/MacOS/ || true)
           )
       ENDFOREACH()
 

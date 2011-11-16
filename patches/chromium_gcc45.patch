@@ -1,0 +1,33 @@
+diff -u -r build/chromium/src/third_party/ppapi/cpp/module.cc third_party2/ppapi/cpp/module.cc
+--- third_party/ppapi/cpp/module.cc	2011-06-19 01:14:54.000000000 -0700
++++ third_party/ppapi/cpp/module.cc	2011-06-19 00:51:50.000000000 -0700
+@@ -134,7 +134,7 @@
+ 
+ // Module ----------------------------------------------------------------------
+ 
+-Module::Module() : pp_module_(NULL), get_browser_interface_(NULL), core_(NULL) {
++Module::Module() : pp_module_(0), get_browser_interface_(0), core_(NULL) {
+ }
+ 
+ Module::~Module() {
+diff -u -r build/chromium/src/third_party/ppapi/cpp/resource.cc third_party2/ppapi/cpp/resource.cc
+--- third_party/ppapi/cpp/resource.cc	2011-06-19 01:14:54.000000000 -0700
++++ third_party/ppapi/cpp/resource.cc	2011-06-19 00:51:50.000000000 -0700
+@@ -11,7 +11,7 @@
+ 
+ namespace pp {
+ 
+-Resource::Resource() : pp_resource_(NULL) {
++Resource::Resource() : pp_resource_(0) {
+ }
+ 
+ Resource::Resource(const Resource& other) : pp_resource_(other.pp_resource_) {
+@@ -36,7 +36,7 @@
+ 
+ PP_Resource Resource::detach() {
+   PP_Resource ret = pp_resource_;
+-  pp_resource_ = NULL;
++  pp_resource_ = 0;
+   return ret;
+ }
+ 

@@ -28,15 +28,23 @@ SET(CMAKE_MODULE_PATH
   ${BERKELIUM_TOP_LEVEL}
   ${BERKELIUM_TOP_LEVEL}/build/modules/
 )
+
 INCLUDE(ListUtil)
 INCLUDE(CXXTest)
 FIND_PACKAGE(PythonInterp)
+
+IF(NOT DEFINED BERKELIUM_BUILD_DEMOS)
+  SET(BERKELIUM_BUILD_DEMOS TRUE CACHE BOOL "If enabled, builds demos if their dependencies are available.")
+ELSE()
+  SET(BERKELIUM_BUILD_DEMOS BERKELIUM_BUILD_DEMOS CACHE BOOL "If enabled, builds demos if their dependencies are available.")
+ENDIF()
 
 IF(NOT CHROME_ROOT)
   SET(CHROME_ROOT_SEARCH_PATHS
     ${BERKELIUM_CHROME_ROOT_SEARCH_PATHS} # User provided search paths go first
     # Followed by a few reasonable choices within this directory
     ${BERKELIUM_TOP_LEVEL}/chrome
+    ${BERKELIUM_TOP_LEVEL}/chromium/chromium
     ${BERKELIUM_TOP_LEVEL}/chromium
     ${BERKELIUM_TOP_LEVEL}/build/chromium
     ${BERKELIUM_TOP_LEVEL}/build/c
@@ -110,19 +118,25 @@ IF(CHROME_FOUND)
   # Useful values for setting up demo apps
   SET(BERKELIUM_LINK_LIBS -L. debug liblibberkelium_d${CHROMIUM_DYLIB_EXT} optimized liblibberkelium${CHROMIUM_DYLIB_EXT} )
 
-  # ppmrender -- demo app
-  ADD_EXECUTABLE(ppmrender ${BERKELIUM_TOP_LEVEL}/demo/ppmrender/ppmmain.cpp)
-  TARGET_LINK_LIBRARIES(ppmrender ${BERKELIUM_LINK_LIBS})
-  SET_TARGET_PROPERTIES(ppmrender PROPERTIES LINK_FLAGS "${BERKELIUM_LDFLAGS} -Wl,-rpath,${CMAKE_CURRENT_BINARY_DIR}")
-  SET_TARGET_PROPERTIES(ppmrender PROPERTIES SKIP_BUILD_RPATH ON)
-  ADD_DEPENDENCIES(ppmrender libberkelium)
   IF(APPLE)
-    ADD_CHROME_APP(
-      APP ppmrender
-      DEPENDS ppmrender plugin_carbon_interpose
-      LINKS
-      ${CMAKE_CURRENT_BINARY_DIR}/berkelium
-      )
+    ADD_EXECUTABLE(bin_replace ${BERKELIUM_TOP_LEVEL}/util/bin_replace.cpp)
+  ENDIF()
+
+  # ppmrender -- demo app
+  IF(BERKELIUM_BUILD_DEMOS)
+    ADD_EXECUTABLE(ppmrender ${BERKELIUM_TOP_LEVEL}/demo/ppmrender/ppmmain.cpp)
+    TARGET_LINK_LIBRARIES(ppmrender ${BERKELIUM_LINK_LIBS})
+    SET_TARGET_PROPERTIES(ppmrender PROPERTIES LINK_FLAGS "${BERKELIUM_LDFLAGS}")
+    SET_TARGET_PROPERTIES(ppmrender PROPERTIES SKIP_BUILD_RPATH ON)
+    ADD_DEPENDENCIES(ppmrender libberkelium)
+    IF(APPLE)
+      ADD_CHROME_APP(
+        APP ppmrender
+        DEPENDS ppmrender plugin_carbon_interpose
+        COPY
+        ${CMAKE_CURRENT_BINARY_DIR}/berkelium
+        )
+    ENDIF()
   ENDIF()
 
   # demo directory, so we can share some implementation between demos
@@ -137,7 +151,7 @@ IF(CHROME_FOUND)
   ENDIF()
 
   # glut_demo -- demo app
-  IF(OPENGL_FOUND AND GLUT_FOUND)
+  IF(BERKELIUM_BUILD_DEMOS AND OPENGL_FOUND AND GLUT_FOUND)
     ADD_EXECUTABLE(glut_demo ${BERKELIUM_TOP_LEVEL}/demo/glut_demo/glut_demo.cpp)
     TARGET_LINK_LIBRARIES(glut_demo ${BERKELIUM_LINK_LIBS})
     SET_TARGET_PROPERTIES(glut_demo PROPERTIES LINK_FLAGS "${BERKELIUM_LDFLAGS} -Wl,-rpath,${CMAKE_CURRENT_BINARY_DIR}")
@@ -148,14 +162,14 @@ IF(CHROME_FOUND)
       ADD_CHROME_APP(
         APP glut_demo
         DEPENDS glut_demo plugin_carbon_interpose
-        LINKS
+        COPY
         ${CMAKE_CURRENT_BINARY_DIR}/berkelium
         )
     ENDIF()
   ENDIF()
 
   # glut_input -- glut demo app which also handles input
-  IF(OPENGL_FOUND AND GLUT_FOUND)
+  IF(BERKELIUM_BUILD_DEMOS AND OPENGL_FOUND AND GLUT_FOUND)
     ADD_EXECUTABLE(glut_input ${BERKELIUM_TOP_LEVEL}/demo/glut_input/glut_input.cpp)
     TARGET_LINK_LIBRARIES(glut_input ${BERKELIUM_LINK_LIBS})
     SET_TARGET_PROPERTIES(glut_input PROPERTIES LINK_FLAGS "${BERKELIUM_LDFLAGS} -Wl,-rpath,${CMAKE_CURRENT_BINARY_DIR}")
@@ -166,7 +180,7 @@ IF(CHROME_FOUND)
       ADD_CHROME_APP(
         APP glut_input
         DEPENDS glut_input plugin_carbon_interpose
-        LINKS
+        COPY
         ${CMAKE_CURRENT_BINARY_DIR}/berkelium
         )
     ENDIF()
@@ -189,6 +203,8 @@ IF(CHROME_FOUND)
           DESTINATION bin
           LIBRARY
           DESTINATION lib)
+  INSTALL(DIRECTORY include/berkelium
+      DESTINATION include)
   IF(NOT APPLE)
     INSTALL(FILES
           ${CHROMIUM_DATADIR}/chrome.pak

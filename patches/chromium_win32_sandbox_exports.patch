@@ -1,18 +1,18 @@
-Index: sandbox/src/policy_broker.h
+Index: sandbox/src/interception.h
 ===================================================================
---- sandbox/src/policy_broker.h	(revision 28890)
-+++ sandbox/src/policy_broker.h	(working copy)
-@@ -5,6 +5,10 @@
- #ifndef SANDBOX_SRC_POLICY_BROKER_H__
- #define SANDBOX_SRC_POLICY_BROKER_H__
+--- sandbox/src/interception.h	(revision 38681)
++++ sandbox/src/interception.h	(working copy)
+@@ -9,6 +9,10 @@
+ #ifndef SANDBOX_SRC_INTERCEPTION_H_
+ #define SANDBOX_SRC_INTERCEPTION_H_
  
 +#ifndef SANDBOX_EXPORTS
 +#define SANDBOX_EXPORTS 1
 +#endif
 +
- namespace sandbox {
+ #include <list>
+ #include <string>
  
- class InterceptionManager;
 Index: sandbox/src/sandbox_types.h
 ===================================================================
 --- sandbox/src/sandbox_types.h	(revision 28890)

@@ -1,6 +1,6 @@
 Index: third_party/WebKit/Source/WebCore/platform/graphics/chromium/FontChromiumWin.cpp
 ===================================================================
---- third_party/WebKit/Source/WebCore/platform/graphics/chromium/FontChromiumWin.cpp	(revision 78450)
+--- third_party/WebKit/Source/WebCore/platform/graphics/chromium/FontChromiumWin.cpp	(revision 81530)
 +++ third_party/WebKit/Source/WebCore/platform/graphics/chromium/FontChromiumWin.cpp	(working copy)
 @@ -48,6 +48,167 @@
  
@@ -180,7 +180,7 @@ Index: third_party/WebKit/Source/WebCore/platform/graphics/chromium/FontChromium
      // Use the context from the transparency helper when drawing with GDI. It
      // may point to a temporary one.
 @@ -199,7 +360,7 @@
-     bool drawGlyphs(int numGlyphs, const WORD* glyphs, const int* advances, int startAdvance) const;
+     bool drawGlyphs(int numGlyphs, const WORD* glyphs, const int* advances, float startAdvance) const;
  
   private:
 -    virtual IntRect estimateTextBounds();
@@ -197,7 +197,7 @@ Index: third_party/WebKit/Source/WebCore/platform/graphics/chromium/FontChromium
  {
      int totalWidth = 0;
      for (int i = 0; i < m_numGlyphs; i++)
-@@ -273,26 +434,34 @@
+@@ -273,6 +434,12 @@
      int x = lroundf(m_point.x() + startAdvance);
      int y = lroundf(m_point.y() - m_font->fontMetrics().ascent());
  
@@ -210,7 +210,7 @@ Index: third_party/WebKit/Source/WebCore/platform/graphics/chromium/FontChromium
      // If there is a non-blur shadow and both the fill color and shadow color 
      // are opaque, handle without skia. 
      FloatSize shadowOffset;
-     float shadowBlur;
+@@ -280,19 +447,21 @@
      Color shadowColor;
      ColorSpace shadowColorSpace;
      if (m_graphicsContext->getShadow(shadowOffset, shadowBlur, shadowColor, shadowColorSpace)) {

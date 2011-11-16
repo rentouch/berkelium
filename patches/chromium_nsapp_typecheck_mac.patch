@@ -1,8 +1,8 @@
 Index: base/message_pump_mac.mm
 ===================================================================
---- base/message_pump_mac.mm	(revision 74932)
+--- base/message_pump_mac.mm	(revision 76624)
 +++ base/message_pump_mac.mm	(working copy)
-@@ -748,10 +748,7 @@
+@@ -714,10 +714,7 @@
  // returning it to its previous value once the event has been sent.
  NSAutoreleasePool* MessagePumpNSApplication::CreateAutoreleasePool() {
    NSAutoreleasePool* pool = nil;
@@ -16,7 +16,7 @@ Index: base/message_pump_mac.mm
  
 Index: base/chrome_application_mac.mm
 ===================================================================
---- chrome/common/chrome_application_mac.mm	(revision 74932)
+--- chrome/common/chrome_application_mac.mm	(revision 70102)
 +++ chrome/common/chrome_application_mac.mm	(working copy)
 @@ -17,9 +17,6 @@
  + (NSApplication*)sharedApplication {

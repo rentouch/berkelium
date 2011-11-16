@@ -61,7 +61,7 @@ public:
     bool hasFocus() const;
 
     void mouseMoved(int xPos, int yPos);
-    void mouseButton(uint32 buttonID, bool down);
+    void mouseButton(uint32 buttonID, bool down, int clickCount = 1);
     void mouseWheel(int xScroll, int yScroll);
     void textEvent(const wchar_t * evt, size_t evtLength);
     void keyEvent(bool pressed, int mods, int vk_code, int scancode);
@@ -180,10 +180,10 @@ public: /******* RenderWidgetHostView *******/
   void CleanupCompositorWindow();
   void WillWmDestroy();
   void ShowCompositorHostWindow(bool);
+#endif
+
   gfx::PluginWindowHandle AcquireCompositingSurface();
   void ReleaseCompositingSurface(gfx::PluginWindowHandle);
-
-#endif
 
 #if defined(OS_MACOSX)
 
@@ -264,6 +264,7 @@ private:
 
     gfx::Rect mRect;
 
+#if defined(OS_WIN)
     // When we are doing accelerated compositing
 #if defined(OS_WIN)
     HWND compositor_host_window_;

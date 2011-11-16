@@ -28,7 +28,8 @@
  *  - The \ref dev_guide gives an overview of how an application ties
  *    together Berkelium's components to integrate a browser into your
  *    application.
- *  - The \ref api "API Reference" gives an overview of the public classes used
+ *  - The \ref <a href="namespaces.html">API Reference</a> gives an
+ *    overview of the public classes used
  *    to embed Berkelium into an application, with links to documentation
  *    generated automatically from the code.
  *

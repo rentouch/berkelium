@@ -115,7 +115,7 @@ namespace sandbox {
 }
 #endif
 
-AUTO_SINGLETON_INSTANCE(Berkelium::Root);
+BERKELIUM_SINGLETON_INSTANCE(Berkelium::Root);
 namespace Berkelium {
 
 #if defined(OS_POSIX) && !defined(OS_MACOSX)

@@ -289,6 +289,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\berkelium_resources.rc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\chromium\chromium\src\chrome\$(ConfigurationName)\obj\global_intermediate\chrome\browser_resources.rc"
 				>
 			</File>
@@ -306,6 +310,10 @@
 			</File>
 			<File
 				RelativePath="..\..\chromium\chromium\src\chrome\$(ConfigurationName)\obj\global_intermediate\chrome\renderer_resources.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\resource.h"
 				>
 			</File>
 			<File

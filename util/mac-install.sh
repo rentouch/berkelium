@@ -47,7 +47,6 @@ cp build/chromium/src/third_party/WebKit/WebCore/Resources/*Cursor.png "$outdir/
 for header in "include/berkelium"/*; do
     cp "$header" "$outdir/$header"
 done
-g++ util/bin_replace.cpp -o ./bin_replace
 for exe in berkelium ppmrender glut_demo glut_input libplugin_carbon_interpose.dylib; do
     echo "Installing executable $exe"
     ./bin_replace "$PWD/" '@executable_path/../lib/' < "$exe" > "$outdir/bin/$exe"

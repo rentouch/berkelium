@@ -32,25 +32,28 @@
 
 #ifndef _BERKELIUM_SINGLETON_HPP_
 #define _BERKELIUM_SINGLETON_HPP_
+
 #include <memory>
+#include <stdexcept>
+
 namespace Berkelium {
 
-template <class T> class AutoSingleton {
+template <class T> class Singleton {
     static std::auto_ptr<T>sInstance;
 public:
     static T& getSingleton() {
         if (sInstance.get()==NULL)  {
-            throw std::exception();
+            throw std::runtime_error("Called Singleton::getSingleton() before creating the singleton.");
         }
         return *static_cast<T*>(sInstance.get());
     }
-    AutoSingleton() {
+    Singleton() {
         if (sInstance.get()==NULL) {
             std::auto_ptr<T> tmp(static_cast<T*>(this));
             sInstance=tmp;
         }
     }
-    virtual ~AutoSingleton() {
+    virtual ~Singleton() {
         if (sInstance.get()==this)
             sInstance.release();
     }
@@ -61,9 +64,9 @@ public:
 
 }
 #ifdef _WIN32
-#define AUTO_SINGLETON_INSTANCE(ClassName) template<>std::auto_ptr<ClassName>Berkelium::AutoSingleton<ClassName>::sInstance
+#define BERKELIUM_SINGLETON_INSTANCE(ClassName) template<>std::auto_ptr<ClassName>Berkelium::Singleton<ClassName>::sInstance
 #else
-#define AUTO_SINGLETON_INSTANCE(ClassName) template std::auto_ptr<ClassName> Berkelium::AutoSingleton<ClassName>::sInstance; template<>std::auto_ptr<ClassName>Berkelium::AutoSingleton<ClassName>::sInstance
+#define BERKELIUM_SINGLETON_INSTANCE(ClassName) template std::auto_ptr<ClassName> Berkelium::Singleton<ClassName>::sInstance; template<>std::auto_ptr<ClassName>Berkelium::Singleton<ClassName>::sInstance
 #endif
 
 #endif

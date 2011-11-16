@@ -1,6 +1,6 @@
 Index: chrome/common/chrome_paths_mac.mm
 ===================================================================
---- chrome/common/chrome_paths_mac.mm	(revision 64330)
+--- chrome/common/chrome_paths_mac.mm	(revision 70359)
 +++ chrome/common/chrome_paths_mac.mm	(working copy)
 @@ -79,26 +79,20 @@
  }

@@ -91,7 +91,7 @@ void WindowImpl::init(SiteInstance*site, int routing_id) {
         }
         mUniqueId.push_back(letters[rand() % (sizeof(letters)-1)]);
     }
-	
+
     mRenderViewHost = RenderViewHostFactory::Create(
         site,
         this,
@@ -107,6 +107,7 @@ WindowImpl::WindowImpl(const Context*otherContext):
     mController = new NavigationController(this, profile(), otherContext->getImpl()->sessionStorageNamespace());
     mMouseX = 0;
     mMouseY = 0;
+    isLoading = false;
     mCurrentURL = GURL("about:blank");
     zIndex = 0;
     init(mContext->getImpl()->getSiteInstance(), MSG_ROUTING_NONE);
@@ -155,6 +156,7 @@ void WindowImpl::SetIsCrashed(bool state) {
 }
 
 void WindowImpl::SetIsLoading(bool is_loading) {
+    isLoading = is_loading;
     host()->SetIsLoading(is_loading);
 }
 int WindowImpl::GetBrowserWindowID() const {
@@ -180,7 +182,7 @@ void WindowImpl::bind(WideString lvalue, const Script::Variant &rvalue) {
     std::string jsonStr;
     if (host() && Berkelium::Script::toJSON(rvalue, &jsonStr)) {
         host()->ExecuteJavascriptInWebFrame(
-            string16(), 
+            string16(),
             WideToUTF16(lvalue.get<std::wstring>() + L" = " + UTF8ToWide(jsonStr) + L";\n"));
     }
 }
@@ -205,7 +207,7 @@ void WindowImpl::clearStartLoading() {
 }
 
 void WindowImpl::evalInitialJavascript() {
-    const char *berkeliumFunc = 
+    const char *berkeliumFunc =
         "if(!window.Berkelium){(function(bkID){"
         "  var bkCallbacks = {};"
         "  function syncAsyncCall(name, args, issync){"
@@ -357,10 +359,10 @@ void WindowImpl::mouseMoved(int xPos, int yPos) {
             break;
     }
 }
-void WindowImpl::mouseButton(unsigned int buttonID, bool down) {
+void WindowImpl::mouseButton(unsigned int buttonID, bool down, int clickCount) {
     Widget *wid = getWidgetAtPoint(mMouseX, mMouseY, true);
     if (wid) {
-        (wid)->mouseButton(buttonID, down);
+        (wid)->mouseButton(buttonID, down, clickCount);
     }
 }
 void WindowImpl::mouseWheel(int xScroll, int yScroll) {
@@ -601,9 +603,17 @@ bool WindowImpl::OnMessageReceived(const IPC::Message& message) {
     return handled;
 }
 
-void WindowImpl::DidStartLoading() {
-    SetIsLoading(true);
 
+const GURL& WindowImpl::GetURL() const {
+	return mCurrentURL;
+}
+
+
+void WindowImpl::DidStartLoading() {
+    if (isLoading)
+        return;
+
+    SetIsLoading(true);
     evalInitialJavascript();
 
     if (mDelegate) {
@@ -683,11 +693,15 @@ WebPreferences WindowImpl::GetWebkitPrefs() {
 }
 
 void WindowImpl::UpdateHistoryForNavigation(
-    const GURL& virtual_url,
-    const NavigationController::LoadCommittedDetails& details,
-    const ViewHostMsg_FrameNavigate_Params& params) {
+	scoped_refptr<history::HistoryAddPageArgs> add_page_args)
+{
   if (profile()->IsOffTheRecord())
     return;
+
+  // Add to history service.
+  HistoryService* hs = profile()->GetHistoryService(Profile::IMPLICIT_ACCESS);
+  if (hs)
+    hs->AddPage(*add_page_args);
 }
 
 ViewMsg_Navigate_Type::Value GetNavigationType(
@@ -964,7 +978,9 @@ void WindowImpl::DidNavigate(RenderViewHost* rvh,
     // URLs, we use a data: URL as the real value.  We actually want to save
     // the about: URL to the history db and keep the data: URL hidden. This is
     // what the TabContents' URL getter does.
-    UpdateHistoryForNavigation(GetURL(), details, params);
+    scoped_refptr<history::HistoryAddPageArgs> add_page_args(
+        CreateHistoryAddPageArgs(GetURL(), details, params));
+	UpdateHistoryForNavigation(add_page_args);
   }
 
   if (!did_navigate)
@@ -982,6 +998,33 @@ void WindowImpl::DidNavigate(RenderViewHost* rvh,
   }
   //DidNavigateAnyFramePostCommit(details, params);
 }
+
+
+scoped_refptr<history::HistoryAddPageArgs>
+WindowImpl::CreateHistoryAddPageArgs(
+    const GURL& virtual_url,
+    const NavigationController::LoadCommittedDetails& details,
+    const ViewHostMsg_FrameNavigate_Params& params) {
+  scoped_refptr<history::HistoryAddPageArgs> add_page_args(
+      new history::HistoryAddPageArgs(
+          params.url, base::Time::Now(), this, params.page_id, params.referrer,
+          params.redirects, params.transition, history::SOURCE_BROWSED,
+          details.did_replace_entry));
+  if (PageTransition::IsMainFrame(params.transition) &&
+      virtual_url != params.url) {
+    // Hack on the "virtual" URL so that it will appear in history. For some
+    // types of URLs, we will display a magic URL that is different from where
+    // the page is actually navigated. We want the user to see in history what
+    // they saw in the URL bar, so we add the virtual URL as a redirect.  This
+    // only applies to the main frame, as the virtual URL doesn't apply to
+    // sub-frames.
+    add_page_args->url = virtual_url;
+    if (!add_page_args->redirects.empty())
+      add_page_args->redirects.back() = virtual_url;
+  }
+  return add_page_args;
+}
+
 
 void WindowImpl::UpdateState(RenderViewHost* rvh,
                               int32 page_id,
@@ -1052,7 +1095,7 @@ void WindowImpl::RunFileChooser(const ViewHostMsg_RunFileChooser_Params&params) 
           mode = FileOpen;
           break;
       }
-      mDelegate->onRunFileChooser(this, mode, 
+      mDelegate->onRunFileChooser(this, mode,
                                   WideString::point_to(title),
                                   FileString::point_to(filepath));
   }

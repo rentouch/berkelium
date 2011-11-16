@@ -1,8 +1,8 @@
 Index: chrome/renderer/webplugin_delegate_proxy.cc
 ===================================================================
---- chrome/renderer/webplugin_delegate_proxy.cc	(revision 48564)
+--- chrome/renderer/webplugin_delegate_proxy.cc	(revision 77228)
 +++ chrome/renderer/webplugin_delegate_proxy.cc	(working copy)
-@@ -323,6 +323,32 @@
+@@ -329,6 +329,32 @@
    params.arg_names = arg_names;
    params.arg_values = arg_values;
    params.host_render_view_routing_id = render_view_->routing_id();

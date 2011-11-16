@@ -40,3 +40,7 @@ installed-chromium
 
 # generated documentation
 berkelium_docs
+
+# eclipse files
+.project
+.cproject

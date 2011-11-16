@@ -1,10 +1,10 @@
 Index: sandbox/src/Wow64.cc
 ===================================================================
---- sandbox/src/Wow64.cc	(revision 29571)
+--- sandbox/src/Wow64.cc	(revision 76854)
 +++ sandbox/src/Wow64.cc	(working copy)
-@@ -165,9 +165,17 @@
- bool Wow64::RunWowHelper(void* buffer, DWORD timeout_ms) {
-   COMPILE_ASSERT(sizeof(buffer) <= sizeof(timeout_ms), unsupported_64_bits);
+@@ -137,9 +137,17 @@
+ bool Wow64::RunWowHelper(void* buffer) {
+   COMPILE_ASSERT(sizeof(buffer) <= sizeof DWORD, unsupported_64_bits);
  
 -  // Get the path to the helper (beside the exe).
 +  // Get the path to the helper (beside this module).
@@ -22,4 +22,3 @@ Index: sandbox/src/Wow64.cc
    std::wstring path(prog_name);
    size_t name_pos = path.find_last_of(L"\\");
    if (std::wstring::npos == name_pos)
-

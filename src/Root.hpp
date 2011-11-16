@@ -33,7 +33,7 @@
 #include "base/mac/scoped_nsautorelease_pool.h"
 #include "berkelium/Platform.hpp"
 #include "berkelium/Berkelium.hpp"
-#include "berkelium/Singleton.hpp"
+#include "Singleton.hpp"
 #include "chrome/browser/profiles/profile.h"
 #include "content/common/notification_service.h"
 #include "base/memory/ref_counted.h"
@@ -63,7 +63,7 @@ class MemoryRenderViewHostFactory;
 class ErrorDelegate;
 
 //singleton class that contains chromium singletons. Not visible outside of Berkelium library core
-class Root : public AutoSingleton<Root> {
+class Root : public Singleton<Root> {
     Profile* mProf;
     scoped_ptr<ui::SystemMonitor> mSysMon;
     scoped_ptr<HighResolutionTimerManager> mTimerMgr;

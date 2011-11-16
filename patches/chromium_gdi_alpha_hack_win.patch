@@ -1,6 +1,6 @@
 Index: webkit/glue/webthemeengine_impl_win.cc
 ===================================================================
---- webkit/glue/webthemeengine_impl_win.cc	(revision 54509)
+--- webkit/glue/webthemeengine_impl_win.cc	(revision 73890)
 +++ webkit/glue/webthemeengine_impl_win.cc	(working copy)
 @@ -24,6 +24,19 @@
    return result;

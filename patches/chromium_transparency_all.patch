@@ -1,8 +1,8 @@
 Index: chrome/renderer/render_widget.cc
 ===================================================================
---- chrome/renderer/render_widget.cc   (revision 64206)
+--- chrome/renderer/render_widget.cc   (revision 75447)
 +++ chrome/renderer/render_widget.cc   (working copy)
-@@ -527,6 +527,11 @@ void RenderWidget::DoDeferredUpdate() {
+@@ -608,6 +608,11 @@
        NOTREACHED();
        return;
      }

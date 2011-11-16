@@ -5,7 +5,16 @@
  *  Berkelium has some global initialization and destruction code that needs to
  *  be run once inside the process instantiating new windows (or web pages).
  *  \code
- *  Berkelium::init();
+ *  if (!Berkelium::init(FileString::empty()))
+ *    std::cout << "Couldn't initialize Berkelium." << std::endl;
+ *  \endcode
+ *  The parameter is the directory for user data, and defaults to a temporary
+ *  directory if it is empty.
+ *
+ *  To allow the pages to update, you need to periodically pass control the
+ *  Berkelium:
+ *  \code
+ *  Berkelium::update();
  *  \endcode
  *
  *  When the process is exiting, to ensure all resources are cleanly released,
@@ -26,6 +35,9 @@
  *  is performed via the Berkelium::Window class.  Simply instantiate the class,
  *  set its size, and point it to a location:
  *  \code
+ *    Berkelium::Context* context = Berkelium::Context::create();
+ *    Berkelium::Window* window = Berkelium::Window::create(context);
+ *    delete context;
  *    Berkelium::Window* window = Berkelium::Window::create();
  *    window->resize(512, 512);
  *    std::string url = "http://berkelium.org";
@@ -48,20 +60,18 @@
  *  and pass them onto your drawing layer
  *  \code
  *  class MyDelegate : public Berkelium::WindowDelegate {
- *    virtual void onPaint(Window *wini,
- *        const unsigned char *bitmap_in, const Rect &bitmap_rect,
- *        int dx, int dy, const Rect &scroll_rect) {
+ *    virtual void onPaint(Berkelium::Window* wini,
+ *        const unsigned char *bitmap_in, const Berkelium::Rect &bitmap_rect,
+ *        size_t num_copy_rects, const Berkelium::Rect* copy_rects,
+ *        int dx, int dy, const Berkelium::Rect& scroll_rect) {
  *      // handle paint events...
  *    }
  *  };
  *  \endcode
- *  and replace the above instantiation code with the following:
+ *  and attach an instance to the Berkelium window created earlier (before
+ *  calling navigateTo):
  *  \code
- *    Berkelium::Window* window = Berkelium::Window::create();
- *    window->resize(512, 512);
  *    window->setDelegate( new MyDelegate() );
- *    std::string url = "http://berkelium.org";
- *    window->navigateTo(url.data(), url.length());
  *  \endcode
  *  which adds a delegate to handle drawing.  The delegate would be invoked as
  *  necessary, passing the new display information into your application.

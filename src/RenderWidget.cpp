@@ -390,6 +390,16 @@ gfx::PluginWindowHandle RenderWidget::AcquireCompositingSurface() {
 void RenderWidget::ReleaseCompositingSurface(gfx::PluginWindowHandle) {
   ShowCompositorHostWindow(false);
 }
+
+#else
+
+gfx::PluginWindowHandle RenderWidget::AcquireCompositingSurface() {
+    return gfx::PluginWindowHandle();
+}
+
+void RenderWidget::ReleaseCompositingSurface(gfx::PluginWindowHandle) {
+}
+
 #endif
 
 #if defined(OS_MACOSX)
@@ -650,7 +660,7 @@ void RenderWidget::mouseWheel(int scrollX, int scrollY) {
 	}
 }
 
-void RenderWidget::mouseButton(unsigned int mouseButton, bool down) {
+void RenderWidget::mouseButton(unsigned int mouseButton, bool down, int clickCount) {
     unsigned int buttonChangeMask=0;
     switch(mouseButton) {
       case 0:
@@ -682,7 +692,7 @@ void RenderWidget::mouseButton(unsigned int mouseButton, bool down) {
         break;
     }
     if (down){
-        event.clickCount=1;
+        event.clickCount=clickCount;
         this->mButton = event.button;
     } else {
         this->mButton = WebKit::WebMouseEvent::ButtonNone;

@@ -10,7 +10,9 @@ For Windows instructions, see WINDOWS-BUILDING.txt in the win32/ folder.
 
 For Mac or Linux, first use the automated script to build chromium:
 util/build-chromium.sh
-You can specify options to it, see --help for more information.
+You can specify options to it, see --help for more information. The most
+important option is probably --deps, which on supported platforms (e.g. Ubuntu,
+Fedora), will try to install required dependencies from system packages.
 
 For a Debug build of chromium, export CHROMIUM_DEBUG=true
     Warning: Debug requires 4GB RAM and 64-bit Linux or Mac OS X 10.6
