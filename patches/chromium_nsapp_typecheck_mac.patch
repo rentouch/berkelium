@@ -14,17 +14,3 @@ Index: base/message_pump_mac.mm
    return pool;
  }
  
-Index: base/chrome_application_mac.mm
-===================================================================
---- chrome/common/chrome_application_mac.mm	(revision 70102)
-+++ chrome/common/chrome_application_mac.mm	(working copy)
-@@ -17,9 +17,6 @@
- + (NSApplication*)sharedApplication {
-   NSApplication* app = [super sharedApplication];
-   if (![NSApp isKindOfClass:self]) {
--    LOG(ERROR) << "NSApp should be of type " << [[self className] UTF8String]
--               << ", not " << [[NSApp className] UTF8String];
--    DCHECK(false) << "NSApp is of wrong type";
-   }
-   return app;
- }

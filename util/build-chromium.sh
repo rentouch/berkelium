@@ -91,6 +91,8 @@ function clean_dir {
 
 # Usage: careful_patch directory patchfile
 function careful_patch {
+    echo
+    echo "Applying patch $2"
     user_eval "cd $1 && (patch --batch -R -p0 -N --dry-run < $2 2>/dev/null || patch --batch -p0 -N < $2)"
     RET=$?
     if [[ $RET -ne 0 ]]; then
