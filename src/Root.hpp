@@ -62,24 +62,12 @@ namespace Berkelium {
 class MemoryRenderViewHostFactory;
 class ErrorDelegate;
 
+class BerkeliumMainDelegate;
+
 //singleton class that contains chromium singletons. Not visible outside of Berkelium library core
 class Root : public Singleton<Root> {
-    Profile* mProf;
-    scoped_ptr<base::SystemMonitor> mSysMon;
-    scoped_ptr<HighResolutionTimerManager> mTimerMgr;
-    scoped_ptr<chrome_browser_net::PredictorInit> mDNSPrefetch;
-    net::URLRequestContextGetter* mDefaultRequestContext;
-    scoped_ptr<MessageLoop> mMessageLoop;
-    scoped_ptr<NotificationService> mNotificationService;
-    scoped_ptr<ProcessSingleton> mProcessSingleton;
-    scoped_ptr<BrowserThread> mUIThread;
+    scoped_ptr<BerkeliumMainDelegate> mBerkeliumMainDelegate;
     scoped_ptr<MemoryRenderViewHostFactory> mRenderViewHostFactory;
-    base::mac::ScopedNSAutoreleasePool mAutoreleasePool;
-    scoped_refptr<HistogramSynchronizer> mHistogramSynchronizer;
-
-    scoped_ptr<ScopedTempDir> mTempProfileDir; // Used only if non-null
-
-    ErrorDelegate* mErrorHandler;
 
 public:
     Root();
@@ -88,32 +76,27 @@ public:
     bool init(FileString homeDirectory, FileString subprocessDirectory);
 
     bool initialized() {
-        return mProf ? true : false;
+        // TODO(ewencp) figure out where to check for initialization
+        return true;
+        // return mProf ? true : false;
     }
 
     void runUntilStopped();
     void stopRunning();
     void update();
 
-    void setErrorHandler(ErrorDelegate *errorHandler) {
-        mErrorHandler = errorHandler;
-    }
-
-    ErrorDelegate * getErrorHandler () const {
-        return mErrorHandler;
-    }
-
-    ProcessSingleton *getProcessSingleton(){
-        return mProcessSingleton.get();
-    }
     inline Profile* getProfile() {
-        return mProf;
+        // TODO(ewencp) figure out where to get Profile* from.
+        return NULL;
+        //return mProf;
     }
 
     static void SetUpGLibLogHandler();
 
     net::URLRequestContextGetter *getDefaultRequestContext() {
-        return mDefaultRequestContext;
+        // TODO(ewencp) figure out where to get net::URLRequestContextGetter* from.
+        return NULL;
+        //return mDefaultRequestContext;
     }
 };
 

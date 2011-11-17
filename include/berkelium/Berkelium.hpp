@@ -47,13 +47,6 @@ enum DepEnforcement;
 
 namespace Berkelium {
 
-/** May be implemented to handle global errors gracefully.
- */
-class BERKELIUM_EXPORT ErrorDelegate {
-public:
-    virtual ~ErrorDelegate() {}
-};
-
 /* TODO: Allow forkedProcessHook to be called without requiring the
    library to be initialized/in memory (unless this is a sub-process).
    i.e. an inline function that first searches for "--type=" in argv,
@@ -97,8 +90,6 @@ bool BERKELIUM_EXPORT init(FileString homeDirectory);
  *  Berkelium::destroy()!
  */
 void BERKELIUM_EXPORT destroy();
-
-void BERKELIUM_EXPORT setErrorHandler(ErrorDelegate * errorHandler);
 
 /** Runs the message loop until all pending messages are processed.
  *  Must be called from the same thread as all other Berkelium functions,

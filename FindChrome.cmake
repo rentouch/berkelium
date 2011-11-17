@@ -150,6 +150,7 @@ IF(NOT CHROMIUM_ISSCONS)
      ${CHROMIUM_CHLIBS}/third_party/sfntly
      ${CHROMIUM_CHLIBS}/third_party/v8-i18n/build
      ${CHROMIUM_CHLIBS}/third_party/libvpx
+     ${CHROMIUM_CHLIBS}/third_party/speex
      )
 
     SET(CHROMIUM_TPLIBS ${CHROMIUM_CHLIBS}/third_party/openmax/libil.a event zlib png jpeg xslt bz2 Xss ${CHROMIUM_CHLIBS}/third_party/sqlite/libsqlite3.a ${CHROMIUM_CHLIBS}/net/third_party/nss/libssl.a undoview allocator base_i18n xdg_mime seccomp_sandbox symbolize)
@@ -270,6 +271,7 @@ SET(CHROMIUMLIBS
   gcrypt
   quota
   ${CHROMIUM_CHLIBS}/third_party/libjpeg_turbo/libjpeg_turbo.a
+  content_app
   content_browser
   content_common
   content_renderer
@@ -277,6 +279,7 @@ SET(CHROMIUMLIBS
   content_gpu
   content_worker
   content_utility
+  content_ppapi_plugin
   gl
   crcrypto
   ui

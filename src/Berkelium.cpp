@@ -69,8 +69,5 @@ void runUntilStopped() {
 void stopRunning() {
     Root::getSingleton().stopRunning();
 }
-void setErrorHandler (ErrorDelegate *errorHandler) {
-    Root::getSingleton().setErrorHandler(errorHandler);
-}
 
 }

@@ -1,0 +1,45 @@
+Index: content/app/content_main.cc
+===================================================================
+--- content/app/content_main.cc	(revision 108895)
++++ content/app/content_main.cc	(working copy)
+@@ -322,9 +322,12 @@
+   RegisterInvalidParamHandler();
+   _Module.Init(NULL, static_cast<HINSTANCE>(instance));
+ #else
+-int ContentMain(int argc,
+-                char** argv,
++int ContentMain(int xargc,
++                char** xargv,
+                 ContentMainDelegate* delegate) {
++  int argc = xargc;
++  char** argv = xargv;
++
+   // NOTE(willchan): One might ask why this call is done here rather than in
+   // process_util_linux.cc with the definition of
+   // EnableTerminationOnOutOfMemory().  That's because base shouldn't have a
+@@ -364,6 +367,10 @@
+   // its main event loop to get rid of the cruft.
+   base::mac::ScopedNSAutoreleasePool autorelease_pool;
+ 
++  // Add an extra callback before command line parsing is performed so we can
++  // modify the command line.
++  if (delegate) delegate->PreParseCommandLine(&argc, &argv);
++
+   CommandLine::Init(argc, argv);
+ 
+   int exit_code;
+Index: content/app/content_main_delegate.h
+===================================================================
+--- content/app/content_main_delegate.h	(revision 108895)
++++ content/app/content_main_delegate.h	(working copy)
+@@ -17,6 +17,10 @@
+ 
+ class ContentMainDelegate {
+  public:
++  // Invoked right before BasicStartupComplete and right before command line
++  // parsing. The basic startup is done so things like PathService can be used.
++  virtual void PreParseCommandLine(int* argc, char*** argv) {}
++
+   // Tells the embedder that the absolute basic startup has been done, i.e. it's
+   // now safe to create singletons and check the command line. Return true if
+   // the process should exit afterwards, and if so, |exit_code| should be set.
