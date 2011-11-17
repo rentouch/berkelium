@@ -259,8 +259,8 @@ elif [ x"${platform}" = x"Linux" ]; then
                     sudo apt-get install msttcorefonts libgconf2-dev libcairo2-dev libdbus-1-dev
                     sudo apt-get install liborbit2-dev libpopt-dev orbit2 libjpeg-dev libbz2-dev
                     sudo apt-get install libnss3-dev libgnome-keyring-dev libdbus-glib-1-dev
-                    sudo apt-get install libcups2-dev libxss-dev libxtst-dev libpam0g-dev binutils-gold
-                    ;;
+                    sudo apt-get install libcups2-dev libxss-dev libxtst-dev libpam0g-dev
+                    ;; #  binutils-gold (fails on 10.04, may work for later versions)
                 fedora )
                     sudo yum install subversion pkgconfig python perl ruby gcc-c++ bison \
                         flex gperf nss-devel nspr-devel gtk2-devel.i386 glib2-devel.i386 \

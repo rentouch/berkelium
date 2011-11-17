@@ -42,7 +42,6 @@
 #include "base/threading/thread.h"
 #include "base/command_line.h"
 #include "base/file_util.h"
-#include "base/memory/scoped_temp_dir.h"
 #include "base/i18n/icu_util.h"
 #include "net/base/cookie_monster.h"
 #include "chrome/common/chrome_constants.h"
@@ -58,12 +57,12 @@
 #include "content/browser/renderer_host/resource_dispatcher_host.h"
 #include "content/browser/renderer_host/browser_render_process_host.h"
 #include "content/browser/browser_thread.h"
-#include "chrome/browser/browser_url_handler.h"
+#include "content/browser/browser_url_handler.h"
 #include "chrome/browser/net/predictor_api.h"
 #include "content/common/hi_res_timer_manager.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/base/ui_base_paths.h"
-#include "ui/base/system_monitor/system_monitor.h"
+#include "base/system_monitor/system_monitor.h"
 #include "chrome/browser/prefs/pref_service.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/logging_chrome.h"
@@ -300,7 +299,7 @@ bool Root::init(FileString homeDirectory, FileString subprocessDirectory) {
         RenderProcessHost::set_run_renderer_in_process(true);
     }
     mMessageLoop.reset(new MessageLoop(MessageLoop::TYPE_UI));
-    mSysMon.reset(new ui::SystemMonitor);
+    mSysMon.reset(new base::SystemMonitor);
     mTimerMgr.reset(new HighResolutionTimerManager);
     mUIThread.reset(new BrowserThread(BrowserThread::UI, mMessageLoop.get()));
     mErrorHandler = 0;
@@ -426,7 +425,7 @@ bool Root::init(FileString homeDirectory, FileString subprocessDirectory) {
     browser::RegisterLocalState(g_browser_process->local_state());
 
     ProfileManager* profile_manager = browser_process->profile_manager();
-    homedirpath = homedirpath.Append(profile_manager->GetCurrentProfileDir());
+    homedirpath = homedirpath.Append(profile_manager->GetInitialProfileDir());
     {
         //std::cout << "Profile path: " << homedirpath.value() << std::endl;
         FilePath prefs_path (ProfileManager::GetProfilePrefsPath(homedirpath));
@@ -457,7 +456,8 @@ bool Root::init(FileString homeDirectory, FileString subprocessDirectory) {
       browser_process->local_state(),
       CommandLine::ForCurrentProcess()->HasSwitch(switches::kEnablePreconnect)));
 
-    BrowserURLHandler::InitURLHandlers();
+    // Gone with refactoring as singleton?
+    // BrowserURLHandler::InitURLHandlers();
 
     mDefaultRequestContext=mProf->GetRequestContext();
     return true;

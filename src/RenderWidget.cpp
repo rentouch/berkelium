@@ -52,6 +52,8 @@
 #include "RenderWidget.hpp"
 #include "WindowImpl.hpp"
 
+#include "third_party/WebKit/Source/WebKit/chromium/public/WebScreenInfo.h"
+
 #include <iostream>
 
 namespace Berkelium {
@@ -126,8 +128,11 @@ void RenderWidget::SetSize(const gfx::Size& size){
 
   // Retrieves the native view used to contain plugins and identify the
   // renderer in IPC messages.
-gfx::NativeView RenderWidget::GetNativeView(){
+gfx::NativeView RenderWidget::GetNativeView() const {
     return gfx::NativeView();
+}
+gfx::NativeViewId RenderWidget::GetNativeViewId() const {
+    return gfx::NativeViewId();
 }
 
   // Actually set/take focus to/from the associated View component.
@@ -169,7 +174,9 @@ void RenderWidget::SetIsLoading(bool is_loading){
 }
 
   // Enable or disable IME for the view.
-void RenderWidget::ImeUpdateTextInputState(WebKit::WebTextInputType type, const gfx::Rect& caret_rect){
+void RenderWidget::ImeUpdateTextInputState(ui::TextInputType type,
+    bool can_compose_inline,
+    const gfx::Rect& caret_rect) {
 }
 
 void RenderWidget::ImeCancelComposition() {
@@ -208,7 +215,11 @@ void RenderWidget::SetTooltipText(const std::wstring& tooltip_text){
 }
 
   // Notifies the View that the renderer text selection has changed.
-void RenderWidget::SelectionChanged(const std::string& text) {
+void RenderWidget::SelectionChanged(const std::string& text,
+                                const ui::Range& range,
+                                const gfx::Point& start,
+                                const gfx::Point& end)
+{
 }
 
   // Tells the View whether the context menu is showing. This is used on Linux
@@ -226,7 +237,7 @@ BackingStore* RenderWidget::AllocBackingStore(const gfx::Size& size) {
     return mBacking;
 }
 
-void RenderWidget::InitAsFullscreen() {
+void RenderWidget::InitAsFullscreen(RenderWidgetHostView* reference_host_view) {
 }
 
 #if defined(OS_WIN)
@@ -571,6 +582,22 @@ void RenderWidget::MovePluginWindows(
 #endif
 }
 
+#if defined(OS_POSIX)
+void RenderWidget::GetScreenInfo(WebKit::WebScreenInfo* results) {
+    // TODO(ewencp) Are these really the right values?
+    results->depth = 32;
+    results->depthPerComponent = 8;
+    results->isMonochrome = false;
+    // Maybe the equivalent of GetWindowRect() is right here?
+    results->rect = WebKit::WebRect(mRect.x(), mRect.y(), mRect.width(), mRect.height());
+    results->availableRect = results->rect;
+}
+
+gfx::Rect RenderWidget::GetRootWindowBounds() {
+    return mRect;
+}
+#endif
+
 void RenderWidget::SetBounds(const gfx::Rect&rect) {
     // This is called when webkit has sent us a Move message.
 }
@@ -580,6 +607,16 @@ gfx::PluginWindowHandle RenderWidget::GetCompositingSurface() {
 }
 
 void RenderWidget::SetVisuallyDeemphasized(const SkColor *color, bool deemphasized) {
+}
+
+void RenderWidget::UnhandledWheelEvent(const WebKit::WebMouseWheelEvent& event) {
+}
+
+void RenderWidget::SetHasHorizontalScrollbar(bool has_horizontal_scrollbar) {
+}
+
+void RenderWidget::SetScrollOffsetPinning(
+    bool is_pinned_to_left, bool is_pinned_to_right) {
 }
 
 // Returns true if the native view, |native_view|, is contained within in the

@@ -56,7 +56,7 @@
 #include "content/browser/tab_contents/tab_contents.h"
 #include "content/browser/renderer_host/render_widget_host_view.h"
 #include "content/browser/renderer_host/render_view_host_factory.h"
-#include "chrome/browser/browser_url_handler.h"
+#include "content/browser/browser_url_handler.h"
 #include "content/common/native_web_keyboard_event.h"
 #include "content/browser/renderer_host/render_process_host.h"
 #include "content/common/bindings_policy.h"
@@ -66,7 +66,7 @@
 #include "webkit/plugins/npapi/default_plugin_shared.h"
 #include "webkit/plugins/npapi/plugin_group.h"
 #include "webkit/plugins/npapi/plugin_list.h"
-#include "webkit/plugins/npapi/webplugininfo.h"
+#include "webkit/plugins/webplugininfo.h"
 
 #include <iostream>
 
@@ -298,10 +298,10 @@ void WindowImpl::synchronousScriptReturn(void* reply_msg, const Script::Variant 
     std::string jsonStr = "null";
     if (host() && reply_msg) {
         bool success = Berkelium::Script::toJSON(result, &jsonStr);
-        host()->JavaScriptMessageBoxClosed(
+        host()->JavaScriptDialogClosed(
             static_cast<IPC::Message*>(reply_msg),
             success,
-            UTF8ToWide(jsonStr));
+            UTF8ToUTF16(jsonStr));
     }
 }
 
@@ -419,15 +419,22 @@ void WindowImpl::refresh() {
 }
 
 void WindowImpl::stop() {
-  if (host()) {
-    host()->Stop();
-  }
+    // FIXME(ewencp) seems to have moved from RenderViewHost's interface to
+    // Browser's but I'm not sure how to get between the two.
+    /*
+    if (host()) {
+        host()->Stop();
+    }
+    */
 }
 
 void WindowImpl::adjustZoom(int mode) {
-  if (host()) {
+    // FIXME(ewencp) seems to have moved from RenderViewHost's interface to
+    // Browser's but I'm not sure how to get between the two.
+/*  if (host()) {
     host()->Zoom((PageZoom::Function)mode);
   }
+*/
 }
 
 void WindowImpl::goBack() {
@@ -467,12 +474,14 @@ void WindowImpl::executeJavascript(WideString javascript) {
 }
 
 void WindowImpl::insertCSS(WideString css, WideString id) {
+    /* FIXME(ewencp) InsertCSSInWebFrame was removed between versions 12 and 15.
     if (host()) {
         std::string cssUtf8, idUtf8;
         WideToUTF8(css.data(), css.length(), &cssUtf8);
         WideToUTF8(id.data(), id.length(), &idUtf8);
         host()->InsertCSSInWebFrame(std::wstring(), cssUtf8, idUtf8);
     }
+    */
 }
 
 bool WindowImpl::navigateTo(URLString url) {
@@ -563,7 +572,7 @@ bool WindowImpl::CreateRenderViewForRenderManager(
 
   // Now that the RenderView has been created, we need to tell it its size.
   rwh_view->SetSize(gfx::Size(mRect.width(), mRect.height()));
-  render_view_host->set_view(rwh_view);
+  render_view_host->SetView(rwh_view);
 
   appendWidget(rwh_view);
 
@@ -576,6 +585,10 @@ bool WindowImpl::CreateRenderViewForRenderManager(
 bool WindowImpl::OnMessageReceived(const IPC::Message& message) {
     bool handled = true;
     bool message_is_ok = true;
+    // TODO(ewencp) Apparently a bunch of this has changed. Some of the
+    // commented ones sound kinda important, like PageContents?  We should
+    // probably work from the same registration used in
+    // content/browser/tab_contents/tab_contents.cc.
     IPC_BEGIN_MESSAGE_MAP_EX(TabContents, message, message_is_ok)
       IPC_MESSAGE_HANDLER(ViewHostMsg_DidStartProvisionalLoadForFrame,
                           OnDidStartProvisionalLoadForFrame)
@@ -587,12 +600,12 @@ bool WindowImpl::OnMessageReceived(const IPC::Message& message) {
                           OnDocumentLoadedInFrame)
       IPC_MESSAGE_HANDLER(ViewHostMsg_DidFinishLoad, OnDidFinishLoad)
       IPC_MESSAGE_HANDLER(ViewHostMsg_GoToEntryAtOffset, OnGoToEntryAtOffset)
-      IPC_MESSAGE_HANDLER(ViewHostMsg_MissingPluginStatus, OnMissingPluginStatus)
+//      IPC_MESSAGE_HANDLER(ViewHostMsg_MissingPluginStatus, OnMissingPluginStatus)
       IPC_MESSAGE_HANDLER(ViewHostMsg_CrashedPlugin, OnCrashedPlugin)
 //      IPC_MESSAGE_HANDLER(ViewHostMsg_BlockedOutdatedPlugin,
 //                          OnBlockedOutdatedPlugin)
-      IPC_MESSAGE_HANDLER(ViewHostMsg_PageContents, OnPageContents)
-      IPC_MESSAGE_HANDLER(ViewHostMsg_PageTranslated, OnPageTranslated)
+//      IPC_MESSAGE_HANDLER(ViewHostMsg_PageContents, OnPageContents)
+//      IPC_MESSAGE_HANDLER(ViewHostMsg_PageTranslated, OnPageTranslated)
       IPC_MESSAGE_UNHANDLED(handled = false)
     IPC_END_MESSAGE_MAP_EX()
 
@@ -630,14 +643,16 @@ void WindowImpl::DidStopLoading() {
 
 void WindowImpl::OnAddMessageToConsole(
         int32 log_level,
-        const std::wstring& message,
+        const string16& message,
         int32 line_no,
-        const std::wstring& source_id)
+        const string16& source_id)
 {
     // FIXME: log_level useful?
     if (mDelegate) {
-        mDelegate->onConsoleMessage(this, WideString::point_to(message),
-                                    WideString::point_to(source_id), line_no);
+        std::wstring message_wide(UTF16ToWideHack(message));
+        std::wstring sourceid_wide(UTF16ToWideHack(source_id));
+        mDelegate->onConsoleMessage(this, WideString::point_to(message_wide),
+            WideString::point_to(sourceid_wide), line_no);
     }
 }
 
@@ -669,7 +684,10 @@ RenderViewHostDelegate::View* WindowImpl::GetViewDelegate() {
     return this;
 }
 
-RendererPreferences WindowImpl::GetRendererPrefs(Profile*) const {
+RendererPreferences WindowImpl::GetRendererPrefs(
+    content::BrowserContext* browser_context
+) const
+{
     RendererPreferences ret;
     renderer_preferences_util::UpdateFromSystemSettings(
         &ret, profile());
@@ -783,7 +801,7 @@ bool WindowImpl::NavigateToPendingEntry(NavigationController::ReloadType reload_
 }
 
 bool WindowImpl::UpdateTitleForEntry(NavigationEntry* entry,
-                                     const std::wstring& title) {
+                                     const string16& title) {
   // For file URLs without a title, use the pathname instead. In the case of a
   // synthesized title, we don't want the update to count toward the "one set
   // per page of the title to history."
@@ -793,7 +811,7 @@ bool WindowImpl::UpdateTitleForEntry(NavigationEntry* entry,
     final_title = UTF8ToUTF16(entry->url().ExtractFileName());
     explicit_set = false;  // Don't count synthetic titles toward the set limit.
   } else {
-    TrimWhitespace(WideToUTF16Hack(title), TRIM_ALL, &final_title);
+    TrimWhitespace(title, TRIM_ALL, &final_title);
     explicit_set = true;
   }
 
@@ -892,15 +910,25 @@ void WindowImpl::OnGetHistoryListCount(int* back_list_count,
 void WindowImpl::OnMissingPluginStatus(int status){
 }
 void WindowImpl::OnCrashedPlugin(const FilePath& plugin_path) {
-    DCHECK(!plugin_path.value().empty());
+    // Modified from Browser::CrashedPluginHelper
+  DCHECK(!plugin_path.value().empty());
 
-    string16 plugin_name = plugin_path.LossyDisplayName();
-    webkit::npapi::WebPluginInfo plugin_info;
-    if (webkit::npapi::PluginList::Singleton()->GetPluginInfoByPath(
-            plugin_path, &plugin_info) &&
-        !plugin_info.name.empty()) {
-        plugin_name = plugin_info.name;
-    }
+  string16 plugin_name = plugin_path.LossyDisplayName();
+  webkit::WebPluginInfo plugin_info;
+  if (webkit::npapi::PluginList::Singleton()->GetPluginInfoByPath(
+          plugin_path, &plugin_info) &&
+      !plugin_info.name.empty()) {
+    plugin_name = plugin_info.name;
+#if defined(OS_MACOSX)
+    // Many plugins on the Mac have .plugin in the actual name, which looks
+    // terrible, so look for that and strip it off if present.
+    const std::string kPluginExtension = ".plugin";
+    if (EndsWith(plugin_name, ASCIIToUTF16(kPluginExtension), true))
+      plugin_name.erase(plugin_name.length() - kPluginExtension.length());
+#endif  // OS_MACOSX
+  }
+
+  // Berkelium customized
     if (mDelegate) {
         std::wstring plugin_wide = UTF16ToWide(plugin_name);
         mDelegate->onCrashedPlugin(this, WideString::point_to(plugin_wide));
@@ -1057,8 +1085,12 @@ void WindowImpl::NavigationEntryCommitted(NavigationController::LoadCommittedDet
 	}
 }
 
-void WindowImpl::UpdateTitle(RenderViewHost* rvh,
-                              int32 page_id, const std::wstring& title) {
+void WindowImpl::UpdateTitle(
+    RenderViewHost* rvh,
+    int32 page_id,
+    const string16& title,
+    base::i18n::TextDirection title_direction
+) {
   // If we have a title, that's a pretty good indication that we've started
   // getting useful data.
   //SetNotWaitingForResponse();
@@ -1073,7 +1105,10 @@ void WindowImpl::UpdateTitle(RenderViewHost* rvh,
 void WindowImpl::ShowRepostFormWarningDialog() {
 }
 
-void WindowImpl::RunFileChooser(const ViewHostMsg_RunFileChooser_Params&params) {
+void WindowImpl::RunFileChooser(
+    RenderViewHost* render_view_host,
+    const ViewHostMsg_RunFileChooser_Params& params
+) {
   if (mDelegate) {
       std::wstring title = UTF16ToWideHack(params.title);
       const FilePath::StringType &filepath = params.default_file_name.value();
@@ -1163,21 +1198,22 @@ void WindowImpl::DomOperationResponse(const std::string& json_string,
 }
 
 void WindowImpl::RunJavaScriptMessage(
-    const std::wstring& message,
-    const std::wstring& default_prompt,
+    const RenderViewHost* rvh,
+    const string16& message,
+    const string16& default_prompt,
     const GURL& frame_url,
     const int flags,
     IPC::Message* reply_msg,
     bool* did_suppress_message)
 {
     bool success = false;
-    std::wstring promptstr;
+    string16 promptstr;
 
-    if (default_prompt == L"urn:uuid:" + mUniqueId
+    if (default_prompt == WideToUTF16(L"urn:uuid:" + mUniqueId)
             && flags == ui::MessageBoxFlags::kIsJavascriptPrompt) {
         GURL origin = frame_url.GetOrigin();
         const std::string &urlspec = origin.spec();
-        if (!javascriptCall(reply_msg, URLString::point_to(urlspec), message)) {
+        if (!javascriptCall(reply_msg, URLString::point_to(urlspec), UTF16ToWide(message))) {
             synchronousScriptReturn(reply_msg, Script::Variant());
         }
         return;
@@ -1198,17 +1234,19 @@ void WindowImpl::RunJavaScriptMessage(
 			bkflags = JavascriptAlert;
 			break;
 		}
+        std::wstring message_wide(UTF16ToWideHack(message));
+        std::wstring default_prompt_wide(UTF16ToWideHack(default_prompt));
         mDelegate->onScriptAlert(
-            this, WideString::point_to(message),
-            WideString::point_to(default_prompt),
+            this, WideString::point_to(message_wide),
+            WideString::point_to(default_prompt_wide),
             URLString::point_to(frame_url_str),
             bkflags, success, prompt
         );
-        prompt.get(promptstr);
+        WideToUTF16(prompt.data(), prompt.size(), &promptstr);
         mDelegate->freeLastScriptAlert(prompt);
     }
     if (host()) {
-        host()->JavaScriptMessageBoxClosed(reply_msg, success, promptstr);
+        host()->JavaScriptDialogClosed(reply_msg, success, promptstr);
     }
 }
 
@@ -1221,6 +1259,7 @@ void WindowImpl::Close(RenderViewHost* rvh) {
 void WindowImpl::OnDidStartProvisionalLoadForFrame(
         int64 frame_id,
         bool is_main_frame,
+        bool has_opener_set,
         const GURL& url) {
     if (!is_main_frame) {
         return;
@@ -1259,6 +1298,7 @@ void WindowImpl::OnDidStartProvisionalLoadForFrame(
 
 void WindowImpl::OnDidRedirectProvisionalLoad(
     int32 page_id,
+    bool has_opener_set,
     const GURL& source_url,
     const GURL& target_url)
 {
@@ -1273,10 +1313,11 @@ void WindowImpl::OnDidRedirectProvisionalLoad(
     entry->set_url(target_url);
 }
 
-void WindowImpl::OnDidRedirectResource(const ResourceRedirectDetails& details) {
-    // Only accessor function:
-    // details->new_url();
-}
+// Removed? See comment in .h
+//void WindowImpl::OnDidRedirectResource(const ResourceRedirectDetails& details) {
+//    // Only accessor function:
+//    // details->new_url();
+//}
 
 void WindowImpl::OnDidFailProvisionalLoadWithError(
         int64 frame_id,

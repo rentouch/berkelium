@@ -47,7 +47,6 @@
 #include "base/utf_string_conversions.h"
 #include "chrome/browser/browser_about_handler.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/browser_url_handler.h"
 #include "content/browser/in_process_webkit/session_storage_namespace.h"
 #include "content/browser/in_process_webkit/webkit_context.h"
 #include "chrome/browser/prefs/pref_service.h"
@@ -58,6 +57,7 @@
 #include "content/browser/tab_contents/navigation_entry.h"
 #include "content/browser/tab_contents/tab_contents.h"
 #include "content/browser/tab_contents/tab_contents_delegate.h"
+#include "content/browser/browser_url_handler.h"
 #include "chrome/common/chrome_constants.h"
 #include "content/common/navigation_types.h"
 #include "content/common/notification_service.h"
@@ -75,8 +75,8 @@ namespace {
 
 using ::Berkelium::NavigationController;
 
-const int kInvalidateAllButShelves =
-    0xFFFFFFFF & ~TabContents::INVALIDATE_BOOKMARK_BAR;
+//const int kInvalidateAllButShelves =
+//    0xFFFFFFFF & ~TabContents::INVALIDATE_BOOKMARK_BAR;
 
 // Invoked when entries have been pruned, or removed. For example, if the
 // current entries are [google, digg, yahoo], with the current entry google,
@@ -258,7 +258,7 @@ NavigationEntry* NavigationController::CreateNavigationEntry(
   // used internally.
   GURL loaded_url(url);
   bool reverse_on_redirect = false;
-  BrowserURLHandler::RewriteURLIfNecessary(
+  BrowserURLHandler::GetInstance()->RewriteURLIfNecessary(
       &loaded_url, profile, &reverse_on_redirect);
 
   NavigationEntry* entry = new NavigationEntry(
@@ -450,7 +450,7 @@ void NavigationController::RemoveEntryAtIndex(int index,
 void NavigationController::UpdateVirtualURLToURL(
     NavigationEntry* entry, const GURL& new_url) {
   GURL new_virtual_url(new_url);
-  if (BrowserURLHandler::ReverseURLRewrite(
+  if (BrowserURLHandler::GetInstance()->ReverseURLRewrite(
           &new_virtual_url, entry->virtual_url(), profile_)) {
     entry->set_virtual_url(new_virtual_url);
   }

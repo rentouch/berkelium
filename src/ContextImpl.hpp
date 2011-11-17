@@ -35,13 +35,15 @@
 #include "berkelium/Context.hpp"
 #include "content/browser/browsing_instance.h"
 
+class Profile;
+class SiteInstance;
 class SessionStorageNamespace;
 
 namespace Berkelium {
 class ContextImpl :public Context{
 public:
     ContextImpl(const ContextImpl&other);
-    ContextImpl(Profile*prof, SiteInstance*si, SessionStorageNamespace *ssn);
+    ContextImpl(Profile* prof, SiteInstance* si, SessionStorageNamespace *ssn);
     ContextImpl(Profile*prof);
     ~ContextImpl();
 
@@ -67,7 +69,7 @@ private:
     scoped_refptr<SiteInstance> mSiteInstance;
     Profile *mProfile;
     scoped_refptr<SessionStorageNamespace> mSessionNamespace;
-    
+
 };
 
 }

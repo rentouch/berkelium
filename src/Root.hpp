@@ -44,7 +44,7 @@
 class BrowserRenderProcessHost;
 class ProcessSingleton;
 class URLRequestContext;
-namespace ui {
+namespace base {
     class SystemMonitor;
 }
 namespace net {
@@ -65,7 +65,7 @@ class ErrorDelegate;
 //singleton class that contains chromium singletons. Not visible outside of Berkelium library core
 class Root : public Singleton<Root> {
     Profile* mProf;
-    scoped_ptr<ui::SystemMonitor> mSysMon;
+    scoped_ptr<base::SystemMonitor> mSysMon;
     scoped_ptr<HighResolutionTimerManager> mTimerMgr;
     scoped_ptr<chrome_browser_net::PredictorInit> mDNSPrefetch;
     net::URLRequestContextGetter* mDefaultRequestContext;

@@ -79,9 +79,9 @@ bool MemoryRenderViewHost::OnMessageReceived(const IPC::Message& msg) {
 }
 
 void MemoryRenderViewHost::Memory_OnAddMessageToConsole(int32 log_level,
-                                           const std::wstring& message,
+                                           const string16& message,
                                            int32 line_no,
-                                           const std::wstring& source_id) {
+                                           const string16& source_id) {
     mWindow->OnAddMessageToConsole(log_level, message, line_no, source_id);
 }
 
@@ -98,7 +98,7 @@ MemoryRenderWidgetHost::MemoryRenderWidgetHost(
     mWindow = static_cast<WindowImpl*>(delegate);
     mWidget = static_cast<RenderWidget*>(wid);
 
-    set_view(wid);
+    SetView(wid);
 }
 
 MemoryRenderWidgetHost::~MemoryRenderWidgetHost() {
@@ -133,28 +133,28 @@ void MemoryRenderWidgetHost::Memory_OnMsgUpdateRect(const ViewHostMsg_UpdateRect
 template <class T> void MemoryRenderHostImpl<T>::init() {
     mResizeAckPending=true;
     mWidget=NULL;
-    
+
 }
 template <class T> void MemoryRenderHostImpl<T>::Memory_WasResized() {
     if (this->mResizeAckPending || !this->process()->HasConnection() || !this->view() || !this->renderer_initialized_) {
         return;
     }
-    
+
     gfx::Rect view_bounds = this->view()->GetViewBounds();
     gfx::Size new_size(view_bounds.width(), view_bounds.height());
-    
+
     // Avoid asking the RenderWidget to resize to its current size, since it
     // won't send us a PaintRect message in that case.
     if (new_size == current_size_ || current_size_== gfx::Size())
         return;
-    
+
     if (mInFlightSize != gfx::Size())
         return;
-    
+
     // We don't expect to receive an ACK when the requested size is empty.
     if (!new_size.IsEmpty())
         mResizeAckPending = true;
-    
+
     if (!this->process()->Send(new ViewMsg_Resize(this->routing_id(), new_size,
                                                   this->view()->reserved_contents_rect())))
         mResizeAckPending = false;
@@ -312,4 +312,3 @@ template class MemoryRenderHostImpl<RenderWidgetHost>;
 template class MemoryRenderHostImpl<RenderViewHost>;
 
 }
-

@@ -94,7 +94,8 @@ public: /******* RenderWidgetHostView *******/
 
   // Retrieves the native view used to contain plugins and identify the
   // renderer in IPC messages.
-  virtual gfx::NativeView GetNativeView();
+  virtual gfx::NativeView GetNativeView() const;
+  virtual gfx::NativeViewId GetNativeViewId() const;
 
   // Moves all plugin windows as described in the given list.
   virtual void MovePluginWindows(
@@ -123,7 +124,8 @@ public: /******* RenderWidgetHostView *******/
   // Indicates whether the page has finished loading.
   virtual void SetIsLoading(bool is_loading);
   // Updates the state of the input method attached to the view.
-  virtual void ImeUpdateTextInputState(WebKit::WebTextInputType type,
+  virtual void ImeUpdateTextInputState(ui::TextInputType type,
+                                       bool can_compose_inline,
                                        const gfx::Rect& caret_rect);
 
   // Cancel the ongoing composition of the input method attached to the view.
@@ -165,7 +167,10 @@ public: /******* RenderWidgetHostView *******/
   virtual void SetTooltipText(const std::wstring& tooltip_text);
 
   // Notifies the View that the renderer text selection has changed.
-  virtual void SelectionChanged(const std::string& text);
+  virtual void SelectionChanged(const std::string& text,
+                                const ui::Range& range,
+                                const gfx::Point& start,
+                                const gfx::Point& end);
 
   // Tells the View whether the context menu is showing. This is used on Linux
   // to suppress updates to webkit focus for the duration of the show.
@@ -174,7 +179,11 @@ public: /******* RenderWidgetHostView *******/
   // Allocate a backing store for this view
   virtual BackingStore* AllocBackingStore(const gfx::Size& size);
 
-  virtual void InitAsFullscreen();
+  // Perform all the initialization steps necessary for this object to represent
+  // a full screen window.
+  // |reference_host_view| is the view associated with the creating page that
+  // helps to position the full screen widget on the correct monitor.
+    virtual void InitAsFullscreen(RenderWidgetHostView* reference_host_view);
 
 #if defined(OS_WIN)
   void CleanupCompositorWindow();
@@ -237,12 +246,23 @@ public: /******* RenderWidgetHostView *******/
   virtual void AcceleratedCompositingActivated(bool activated);
 #endif
 
+#if defined(OS_POSIX)
+  virtual void GetScreenInfo(WebKit::WebScreenInfo* results);
+  virtual gfx::Rect GetRootWindowBounds();
+#endif
+
   virtual void SetBounds(const gfx::Rect&);
   virtual gfx::PluginWindowHandle GetCompositingSurface();
 
   // Toggles visual muting of the render view area. This is on when a
   // constrained window is showing.
   virtual void SetVisuallyDeemphasized(const SkColor *color, bool deemphasized);
+
+  virtual void UnhandledWheelEvent(const WebKit::WebMouseWheelEvent& event);
+
+  virtual void SetHasHorizontalScrollbar(bool has_horizontal_scrollbar);
+  virtual void SetScrollOffsetPinning(
+      bool is_pinned_to_left, bool is_pinned_to_right);
 
   // Returns true if the native view, |native_view|, is contained within in the
   // widget associated with this RenderWidgetHostView.

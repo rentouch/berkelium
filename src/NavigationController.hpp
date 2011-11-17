@@ -15,10 +15,10 @@
 #include <vector>
 
 #include "base/memory/linked_ptr.h"
+#include "base/memory/ref_counted.h"
 #include "base/time.h"
 #include "googleurl/src/gurl.h"
 #include "chrome/browser/sessions/session_id.h"
-#include "chrome/browser/ssl/ssl_manager.h"
 #include "content/common/navigation_types.h"
 #include "content/common/page_transition_types.h"
 

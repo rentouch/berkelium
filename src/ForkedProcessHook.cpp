@@ -70,7 +70,6 @@
 #include <string.h>
 #endif
 
-#include "app/app_paths.h"
 #include "chrome/common/chrome_switches.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "base/at_exit.h"
@@ -157,7 +156,9 @@ extern int WorkerMain(const MainFunctionParams&);
 extern int NaClMain(const MainFunctionParams&);
 extern int UtilityMain(const MainFunctionParams&);
 extern int ProfileImportMain(const MainFunctionParams&);
-extern int ZygoteMain(const MainFunctionParams&);
+class ZygoteForkDelegate;
+extern bool ZygoteMain(const MainFunctionParams& params,
+    ZygoteForkDelegate* forkdelegate);
 #if defined(_WIN64)
 extern int NaClBrokerMain(const MainFunctionParams&);
 #endif
@@ -563,7 +564,8 @@ void forkedProcessHook(int argc, char **argv)
     printf("%s %s %s\n",
            version_info.Name().c_str(),
            version_info.Version().c_str(),
-           platform_util::GetVersionStringModifier().c_str());
+        "platform_util::GetVersionStringModifier().c_str()"
+        /*platform_util::GetVersionStringModifier().c_str()*/);
     return;
   }
 #endif  // OS_POSIX
@@ -655,7 +657,7 @@ void forkedProcessHook(int argc, char **argv)
   SetupCRT(parsed_command_line);
 
   // Initialize the Chrome path provider.
-  app::RegisterPathProvider();
+  // FIXME app::RegisterPathProvider();
   chrome::RegisterPathProvider();
   ui::RegisterPathProvider();
 
@@ -889,7 +891,8 @@ void forkedProcessHook(int argc, char **argv)
   } else if (process_type == switches::kZygoteProcess) {
 #if defined(OS_POSIX) && !defined(OS_MACOSX)
     // This function call can return multiple times, once per fork().
-    if (ZygoteMain(main_params)) {
+    // TODO(ewencp) Can this ZygoteForkDelegate be NULL?
+    if (ZygoteMain(main_params, NULL)) {
       // Zygote::HandleForkRequest may have reallocated the command
       // line so update it here with the new version.
       const CommandLine& parsed_command_line =

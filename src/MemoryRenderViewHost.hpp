@@ -104,9 +104,9 @@ public:
 
     void Memory_OnAddMessageToConsole(
         int32 log_level,
-        const std::wstring& message,
+        const string16& message,
         int32 line_no,
-        const std::wstring& source_id);
+        const string16& source_id);
     virtual bool OnMessageReceived(const IPC::Message& msg);
 };
 

@@ -73,7 +73,7 @@ ELSE()
   IF(NOT LINUX_ENABLE_NACL)
     SET(CHROMIUM_PLAT_CFLAGS ${CHROMIUM_PLAT_CFLAGS} -DDISABLE_NACL)
   ENDIF()
-  SET(CHROMIUM_PLAT_LDFLAGS ${CHROMIUM_PLAT_LDFLAGS}  smime3 plds4 plc4 pthread gdk-x11-2.0 gdk_pixbuf-2.0 pangocairo-1.0 gio-2.0 pango-1.0 cairo gobject-2.0 gmodule-2.0 glib-2.0 fontconfig freetype rt gconf-2 glib-2.0 dbus-glib-1 X11 Xtst asound harfbuzz sandbox)
+  SET(CHROMIUM_PLAT_LDFLAGS ${CHROMIUM_PLAT_LDFLAGS}  smime3 plds4 plc4 pthread gdk-x11-2.0 gdk_pixbuf-2.0 pangocairo-1.0 gio-2.0 pango-1.0 cairo gobject-2.0 gmodule-2.0 glib-2.0 fontconfig freetype rt gconf-2 glib-2.0 dbus-glib-1 X11 Xtst asound harfbuzz dbus)
   SET(CHROMIUM_START_GROUP -Wl,--start-group)
   SET(CHROMIUM_END_GROUP -Wl,--end-group)
   SET(CHROMIUM_DLLEXT so)
@@ -90,7 +90,6 @@ IF(NOT CHROMIUM_ISSCONS)
 
    SET(CHROME_LIBRARY_DIRS
      ${CHROMIUM_CHLIBS}
-     ${CHROMIUM_CHLIBS}/app
      ${CHROMIUM_CHLIBS}/base
      ${CHROMIUM_CHLIBS}/base/allocator
      ${CHROMIUM_CHLIBS}/ipc
@@ -100,17 +99,16 @@ IF(NOT CHROMIUM_ISSCONS)
      ${CHROMIUM_CHLIBS}/net
      ${CHROMIUM_CHLIBS}/media
      ${CHROMIUM_CHLIBS}/webkit
-     ${CHROMIUM_CHLIBS}/sandbox
      ${CHROMIUM_CHLIBS}/skia
      ${CHROMIUM_CHLIBS}/remoting
      ${CHROMIUM_CHLIBS}/remoting/proto
      ${CHROMIUM_CHLIBS}/printing
      ${CHROMIUM_CHLIBS}/v8/tools/gyp
-     ${CHROMIUM_CHLIBS}/v8/src/extensions/experimental
      ${CHROMIUM_CHLIBS}/gpu
      ${CHROMIUM_CHLIBS}/ui
      ${CHROMIUM_CHLIBS}/ui/gfx
      ${CHROMIUM_CHLIBS}/ui/gfx/gl
+     ${CHROMIUM_CHLIBS}/ui/gfx/surface
      ${CHROMIUM_CHLIBS}/sdch
      ${CHROMIUM_CHLIBS}/build/temp_gyp
      ${CHROMIUM_CHLIBS}/seccompsandbox
@@ -145,6 +143,13 @@ IF(NOT CHROMIUM_ISSCONS)
      ${CHROMIUM_CHLIBS}/webkit/support
      ${CHROMIUM_CHLIBS}/chrome/browser/sync/protocol
      ${CHROMIUM_CHLIBS}/crypto
+     ${CHROMIUM_CHLIBS}/dbus
+     ${CHROMIUM_CHLIBS}/sql
+     ${CHROMIUM_CHLIBS}/third_party/leveldatabase
+     ${CHROMIUM_CHLIBS}/third_party/libphonenumber
+     ${CHROMIUM_CHLIBS}/third_party/sfntly
+     ${CHROMIUM_CHLIBS}/third_party/v8-i18n/build
+     ${CHROMIUM_CHLIBS}/third_party/libvpx
      )
 
     SET(CHROMIUM_TPLIBS ${CHROMIUM_CHLIBS}/third_party/openmax/libil.a event zlib png jpeg xslt bz2 Xss ${CHROMIUM_CHLIBS}/third_party/sqlite/libsqlite3.a ${CHROMIUM_CHLIBS}/net/third_party/nss/libssl.a undoview allocator base_i18n xdg_mime seccomp_sandbox symbolize)
@@ -182,6 +187,8 @@ SET(CHROMIUMLIBS
   webcore_remaining
   webcore_platform
   webcore_html
+  webcore_rendering
+  webcore_dom
   ${CHROMIUM_TPLIBS}
   dl
   m
@@ -193,7 +200,6 @@ SET(CHROMIUMLIBS
   renderer
   utility
   printing
-  app_base
   appcache
   base
   base_static
@@ -203,7 +209,6 @@ SET(CHROMIUMLIBS
   icui18n
   installer_util
   database
-  syncapi
   sync
   icuuc
   icudata
@@ -211,7 +216,6 @@ SET(CHROMIUMLIBS
   skia_opts
   xml2
   net
-  net_base
   cld
   ots
   googleurl
@@ -230,21 +234,14 @@ SET(CHROMIUMLIBS
   http_server
   cacheinvalidation
   cacheinvalidation_proto_cpp
-  chromoting_base
-  chromoting_client
-  chromoting_host
-  chromoting_protocol
-  chromoting_jingle_glue
   chromotocol_proto_lib
   trace_proto_lib
   jingle_p2p
-  chromoting_plugin
   notifier
+  ppapi_shared
   ppapi_cpp_objects
   ppapi_proxy
-  ppapi_shared_impl
   sync_notifier
-  sync_proto_cpp
   gles2_implementation
   gles2_c_lib
   command_buffer_client
@@ -266,7 +263,6 @@ SET(CHROMIUMLIBS
   yuv_convert_sse2
   yuv_convert
   yarr
-  i18n_api
   cpu_features
   webkit_gpu
   cups
@@ -276,11 +272,35 @@ SET(CHROMIUMLIBS
   ${CHROMIUM_CHLIBS}/third_party/libjpeg_turbo/libjpeg_turbo.a
   content_browser
   content_common
-  webcore_rendering
+  content_renderer
+  content_plugin
+  content_gpu
+  content_worker
+  content_utility
   gl
-  in_memory_url_index_cache_proto_cpp
-  ui_gfx
   crcrypto
+  ui
+  syncapi_core
+  syncapi_service
+  sync_proto
+  sql
+  userfeedback_proto
+  safe_browsing_proto
+  safe_browsing_report_proto
+  leveldatabase
+  in_memory_url_index_cache_proto
+  phonenumber
+  jingle_glue
+  surface
+  sfntly
+  remoting_base
+  remoting_client
+  remoting_client_plugin
+  remoting_jingle_glue
+  remoting_protocol
+  v8-i18n
+  webp_dec
+  vpx
   )
 
 IF (APPLE OR LINUX_ENABLE_NACL)
@@ -300,7 +320,7 @@ SET(CHROME_LDFLAGS -g -shared ${CHROMIUM_CLIBFLAGS})
 FOREACH(CHROMIUMLIB ${CHROME_LIBRARY_DIRS})
   IF(NOT EXISTS ${CHROMIUMLIB})
     IF(CHROME_FOUND)
-      MESSAGE(STATUS "Failed to find Chrome library directory at ${CHROMIUMLIB}")
+      MESSAGE(SEND_ERROR "Failed to find Chrome library directory at ${CHROMIUMLIB}")
     ENDIF()
     SET(CHROME_FOUND FALSE)
   ENDIF()
@@ -308,7 +328,7 @@ ENDFOREACH()
 FOREACH(CHROMIUMINC ${CHROME_INCLUDE_DIRS})
   IF(NOT EXISTS ${CHROMIUMINC})
     IF(CHROME_FOUND)
-      MESSAGE(STATUS "Failed to find Chrome include directory at ${CHROMIUMINC}")
+      MESSAGE(SEND_ERROR "Failed to find Chrome include directory at ${CHROMIUMINC}")
     ENDIF()
     SET(CHROME_FOUND FALSE)
   ENDIF()

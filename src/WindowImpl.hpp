@@ -73,8 +73,8 @@ class WindowImpl :
 	// OnMsgNavigate to update history state.
 	void UpdateHistoryForNavigation(
 	  scoped_refptr<history::HistoryAddPageArgs> add_page_args);
-    bool UpdateTitleForEntry(NavigationEntry* ent, const std::wstring&title);
- 
+    bool UpdateTitleForEntry(NavigationEntry* ent, const string16& title);
+
 	// Returns the history::HistoryAddPageArgs to use for adding a page to
 	// history.
 	scoped_refptr<history::HistoryAddPageArgs> CreateHistoryAddPageArgs(
@@ -161,9 +161,9 @@ public:
     // Called from MemoryRenderViewHost, since RenderViewHost does nothing here?!
     void OnAddMessageToConsole(
         int32 log_level,
-        const std::wstring& message,
+        const string16& message,
         int32 line_no,
-        const std::wstring& source_id);
+        const string16& source_id);
 
     void UpdateCursor(const WebCursor& cursor);
 
@@ -190,7 +190,8 @@ protected:
 protected: /******* RenderViewHostDelegate *******/
 
     virtual RenderViewHostDelegate::View* GetViewDelegate();
-    virtual RendererPreferences GetRendererPrefs(Profile*) const;
+    virtual RendererPreferences GetRendererPrefs(
+        content::BrowserContext* browser_context) const;
     virtual WebPreferences GetWebkitPrefs();
 
     virtual void RendererUnresponsive(RenderViewHost* render_view_host,
@@ -217,20 +218,25 @@ protected: /******* RenderViewHostDelegate *******/
                              const std::string& state);
     virtual void UpdateTitle(RenderViewHost* render_view_host,
                              int32 page_id,
-                             const std::wstring& title);
+                             const string16& title,
+                             base::i18n::TextDirection title_direction);
   virtual void Close(RenderViewHost* render_view_host);
   //virtual void RequestMove(const gfx::Rect& new_bounds);
   virtual void RequestOpenURL(const GURL& url, const GURL& referrer,
                               WindowOpenDisposition disposition);
   virtual void DomOperationResponse(const std::string& json_string,
                                     int automation_id);
-  virtual void RunJavaScriptMessage(const std::wstring& message,
-                                    const std::wstring& default_prompt,
+  virtual void RunJavaScriptMessage(const RenderViewHost* rvh,
+                                    const string16& message,
+                                    const string16& default_prompt,
                                     const GURL& frame_url,
                                     const int flags,
                                     IPC::Message* reply_msg,
                                     bool* did_suppress_message);
-  virtual void RunFileChooser(const ViewHostMsg_RunFileChooser_Params&params);
+
+  virtual void RunFileChooser(
+      RenderViewHost* render_view_host,
+      const ViewHostMsg_RunFileChooser_Params& params);
 
   virtual bool OnMessageReceived(const IPC::Message& message);
 	virtual const GURL& GetURL() const;
@@ -247,13 +253,17 @@ private: /******* Formerly RenderViewHostDelegate::Resource *******/
     void OnDidStartProvisionalLoadForFrame(
         int64 frame_id,
         bool is_main_frame,
+        bool has_opener_set,
         const GURL& url);
 
     void OnDidRedirectProvisionalLoad(int32 page_id,
-                                            const GURL& source_url,
-                                            const GURL& target_url);
+        bool has_opener_set,
+        const GURL& source_url,
+        const GURL& target_url);
 
-    void OnDidRedirectResource(const ResourceRedirectDetails& details);
+    // FIXME removed between chromium 12 and 15? Maybe handled through Observer
+    // class as content/browser/ssl/ssl_manager does?
+    //void OnDidRedirectResource(const ResourceRedirectDetails& details);
 
     void OnDidFailProvisionalLoadWithError(
         int64 frame_id,
